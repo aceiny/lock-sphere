@@ -4,23 +4,14 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  LayoutDashboard,
-  Settings,
-  Code2,
-  Menu,
-  LogOut,
-  KeySquare,
-  ChevronLeft,
-  Sun,
-  Moon,
-} from "lucide-react";
+import { Menu, LogOut, ChevronLeft, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
+import { routes } from "@/constant/sidebar.data";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -30,28 +21,6 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
 
-  const routes = [
-    {
-      label: "Dashboard",
-      icon: LayoutDashboard,
-      href: "/dashboard",
-    },
-    {
-      label: "Password Generator",
-      icon: KeySquare,
-      href: "/generator",
-    },
-    {
-      label: "Settings",
-      icon: Settings,
-      href: "/settings",
-    },
-    {
-      label: "Developer",
-      icon: Code2,
-      href: "/developer",
-    },
-  ];
 
   return (
     <>
