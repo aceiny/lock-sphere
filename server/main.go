@@ -1,28 +1,26 @@
 package main
 
 import (
-	"my-gin-app/config"     // Load environment variables
-	"my-gin-app/database"   // Database connection
-	"my-gin-app/routes"     // API routes
-	"github.com/gin-gonic/gin"
 	"log"
+	"os"
+	"server/config"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// Load .env file
+	
 	config.LoadEnv()
+	config.ConnectDB()
+    r := gin.Default()
 
-	// Connect to PostgreSQL
-	database.ConnectDB()
+    r.GET("/", func(c *gin.Context) {
+        c.JSON(200, gin.H{"message": "Hello, Gin!"})
+    })
 
-	// Initialize Gin router
-	r := gin.Default()
-
-	// Setup routes
-	routes.SetupRoutes(r)
-
-	// Start server
-	port := "8080"
-	log.Printf("🚀 Server running on http://localhost:%s", port)
+	// Start Gin server
+	port := os.Getenv("APP_PORT")
+	log.Printf("Server running on url: %s", os.Getenv("BACKEND_URL"))
 	r.Run(":" + port)
+
 }
