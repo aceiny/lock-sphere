@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/ui/mode-toggle";
-import { Shield, Key, Lock, Fingerprint, ArrowRight } from "lucide-react";
+import { Shield, ArrowRight } from "lucide-react";
 import { landingData } from "@/constant/landing.data";
+import ThemeToggler from "@/components/utils/theme-toggler";
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -36,7 +36,7 @@ export default function HomePage() {
           <Link href="/register">
             <Button>Sign Up</Button>
           </Link>
-          <ModeToggle />
+          <ThemeToggler/>
         </nav>
       </header>
       <main className="flex-1 pt-14">

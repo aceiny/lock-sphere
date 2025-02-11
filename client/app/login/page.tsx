@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { AuthForm } from "@/components/auth/auth-form";
-import { ModeToggle } from "@/components/ui/mode-toggle";
+import ThemeToggler from "@/components/utils/theme-toggler";
 
 export default function LoginPage() {
   return (
@@ -15,7 +15,7 @@ export default function LoginPage() {
         >
           Back to home
         </Link>
-        <ModeToggle />
+        <ThemeToggler/>
       </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}

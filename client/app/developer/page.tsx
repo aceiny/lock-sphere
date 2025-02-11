@@ -10,8 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Github, Linkedin, Mail, Globe, Twitter } from "lucide-react";
+import { Github } from "lucide-react";
 import { developerData } from "@/constant/developer.data";
+import Image from "next/image";
 
 const container = {
   hidden: { opacity: 0 },
@@ -52,7 +53,7 @@ export default function DeveloperPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-4">
                 <div className="relative h-16 w-16 overflow-hidden rounded-full bg-primary/10">
-                  <img
+                  <Image
                     src="/placeholder.svg"
                     alt="Developer"
                     className="object-cover"
@@ -125,7 +126,7 @@ export default function DeveloperPage() {
               <CardDescription>Some of my recent work</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {developerData.projects.map((project, index) => (
+              {developerData.projects.map((project) => (
                 <motion.div
                   key={project.title}
                   variants={item}

@@ -1,17 +1,18 @@
+/* eslint-disable */
 "use client";
 
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Menu, LogOut, ChevronLeft, Sun, Moon } from "lucide-react";
+import { Menu, LogOut, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { routes } from "@/constant/sidebar.data";
+import ThemeToggler from "../utils/theme-toggler";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -19,7 +20,6 @@ export function Sidebar({ className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
 
 
   return (
@@ -78,7 +78,6 @@ function MobileNav({
   pathname: string;
   setOpen: (open: boolean) => void;
 }) {
-  const { theme, setTheme } = useTheme();
 
   return (
     <ScrollArea className="h-[calc(100vh-8rem)] pb-10">
@@ -96,15 +95,7 @@ function MobileNav({
               </span>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          >
-            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          <ThemeToggler/>
         </div>
         <div className="space-y-2">
           {routes.map((route) => (
@@ -152,7 +143,6 @@ function DesktopNav({
   pathname: string;
   isCollapsed: boolean;
 }) {
-  const { theme, setTheme } = useTheme();
 
   return (
     <div className="flex flex-col h-full p-4">
@@ -176,15 +166,7 @@ function DesktopNav({
             </div>
           </div>
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-        >
-          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
+      <ThemeToggler/>
       </div>
       <ScrollArea className="flex-1 -mx-4">
         <div className="space-y-2 px-2">

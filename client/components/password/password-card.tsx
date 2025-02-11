@@ -1,16 +1,8 @@
-"use client";
-
+"use client";;
 import * as React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import {
-  Copy,
-  MoreVertical,
-  Pencil,
-  Trash2,
-  Eye,
-  ExternalLink,
-} from "lucide-react";
+import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,25 +10,10 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { PasswordDialog } from "@/components/password/password-dialogs";
+import { DeleteConfirmationDialog } from "../utils/delete-confarmation-dialog";
+import { PasswordCardActions } from "./password-card-actions";
 
 interface PasswordCardProps {
   title: string;
@@ -71,8 +48,13 @@ export function PasswordCard({
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
+    // Check if the click target is part of the dropdown menu or copy button
     const target = e.target as HTMLElement;
-    if (target.closest('[data-no-card-click="true"]')) {
+    if (
+      target.closest('[role="menu"]') ||
+      target.closest('[role="menuitem"]') ||
+      target.closest('[data-no-card-click="true"]')
+    ) {
       return;
     }
     setShowViewDialog(true);
@@ -122,46 +104,12 @@ export function PasswordCard({
                 </Badge>
               </div>
             </div>
-            <div data-no-card-click="true">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <MoreVertical className="h-4 w-4" />
-                    <span className="sr-only">Open menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem onClick={() => setShowViewDialog(true)}>
-                    <Eye className="mr-2 h-4 w-4" />
-                    View Details
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  {url && (
-                    <DropdownMenuItem
-                      onClick={() => window.open(url, "_blank")}
-                    >
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Visit Site
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={() => setShowDeleteDialog(true)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <PasswordCardActions
+              onView={() => setShowViewDialog(true)}
+              onEdit={() => setShowEditDialog(true)}
+              onDelete={() => setShowDeleteDialog(true)}
+              url={url}
+            />
           </CardHeader>
           <CardContent>
             <div className="text-sm text-muted-foreground">{username}</div>
@@ -170,32 +118,31 @@ export function PasswordCard({
             <div className="text-xs text-muted-foreground">
               Updated {lastUpdated}
             </div>
-            <div data-no-card-click="true">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="opacity-0 group-hover:opacity-100 transition-opacity relative"
-                onClick={handleCopy}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="opacity-0 group-hover:opacity-100 transition-opacity relative"
+              onClick={handleCopy}
+              data-no-card-click="true"
+            >
+              <motion.div
+                animate={copied ? { scale: 0 } : { scale: 1 }}
+                transition={{ duration: 0.2 }}
               >
-                <motion.div
-                  animate={copied ? { scale: 0 } : { scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Copy className="h-4 w-4" />
-                </motion.div>
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={copied ? { scale: 1 } : { scale: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute"
-                >
-                  <Badge variant="secondary" className="pointer-events-none">
-                    Copied!
-                  </Badge>
-                </motion.div>
-                <span className="sr-only">Copy username</span>
-              </Button>
-            </div>
+                <Copy className="h-4 w-4" />
+              </motion.div>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={copied ? { scale: 1 } : { scale: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute"
+              >
+                <Badge variant="secondary" className="pointer-events-none">
+                  Copied!
+                </Badge>
+              </motion.div>
+              <span className="sr-only">Copy username</span>
+            </Button>
           </CardFooter>
         </Card>
       </motion.div>
@@ -226,29 +173,15 @@ export function PasswordCard({
         }}
       />
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the password for {title}. This action
-              cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                // TODO: Implement delete functionality
-                setShowDeleteDialog(false);
-              }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+    <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title={title}
+        onConfirm={() => {
+          // TODO: Implement delete functionality
+          setShowDeleteDialog(false);
+        }}
+      />
     </>
   );
 }
