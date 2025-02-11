@@ -1,0 +1,45 @@
+# Binary files
+*.exe
+*.out
+*.o
+*.so
+*.dll
+
+# Go-related files
+/go.work
+/go.work.sum
+/go.sum
+/go.mod
+/vendor/
+
+# Compiled files and caches
+*.log
+*.test
+*.prof
+*.swp
+*.swo
+*.bak
+*.tmp
+*.DS_Store
+
+# Environment and secrets
+.env
+.env.local
+.env.production
+.env.staging
+.env.test
+
+# Database files (if using SQLite for testing)
+*.db
+*.sqlite
+
+# IDE and editor-specific files
+.vscode/
+.idea/
+*.iml
+
+# Temporary and OS files
+node_modules/
+Thumbs.db
+.DS_Store
+*.swp
