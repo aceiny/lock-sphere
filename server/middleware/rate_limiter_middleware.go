@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"net/http"
-	"server/api/v1/dto/response"
+	"server/dto/response"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"

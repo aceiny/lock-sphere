@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"server/api/v1/dto/response"
+	"server/dto/response"
 	"server/lib"
 	"strings"
 	"github.com/gin-gonic/gin"
