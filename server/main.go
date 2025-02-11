@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"server/config"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +14,7 @@ func main() {
     r := gin.Default()
 
     r.GET("/", func(c *gin.Context) {
-        c.JSON(200, gin.H{"message": "Hello, Gin!"})
+        c.JSON(200, gin.H{"message": "Welcome to lock sphere api , please use the correct endpoint"})
     })
 
 	// Start Gin server
