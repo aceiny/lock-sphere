@@ -2,24 +2,28 @@ package main
 
 import (
 	"log"
-	"os"
+	"server/bootstrap"
 	"server/config"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	
-	config.LoadEnv()
-	config.ConnectDB()
-    r := gin.Default()
+	appConfig , err := config.LoadConfig()
+	if err != nil {
+		log.Fatal("Failed to load configuration:", err)
+	}
 
-    r.GET("/", func(c *gin.Context) {
+	config.ConnectDB(appConfig)
+	config.ConnectRedis(appConfig)
+	server := bootstrap.CreateServer(appConfig)
+    server.GET("/", func(c *gin.Context) {
         c.JSON(200, gin.H{"message": "Welcome to lock sphere api , please use the correct endpoint"})
     })
 
 	// Start Gin server
-	port := os.Getenv("APP_PORT")
-	log.Printf("Server running on url: %s", os.Getenv("BACKEND_URL"))
-	r.Run(":" + port)
+	serverAddr := ":" + appConfig.Port
+	log.Printf("Server starting on %s", serverAddr)
+	log.Fatal(server.Run(serverAddr))
 
 }
