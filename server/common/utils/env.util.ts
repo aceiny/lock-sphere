@@ -39,6 +39,11 @@ const ENV_VAR_TYPES: Record<string, EnvVarConfig> = {
   POOL_TIMEOUT: { type: 'duration' },
   POOL_MAX_CONN_LIFETIME: { type: 'duration' },
 
+  // session configuration
+  SESSION_SECRET: { type: 'string' },
+  SESSION_RESAVE: { type: 'boolean' },
+  SESSION_SAVE_UNINITIALIZED: { type: 'boolean' },
+
   // Cookie Configuration
   COOKIE_SECURE: { type: 'boolean' },
   COOKIE_HTTPONLY: { type: 'boolean' },

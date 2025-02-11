@@ -7,16 +7,16 @@ import { ThrottlerConfig } from 'config/throttler-config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(PostgresConfig),
     ThrottlerModule.forRoot(ThrottlerConfig),
-    UserModule
+    UserModule,
+    AuthModule,
   ],
-  controllers: [
-    AppController
-  ],
+  controllers: [AppController],
   providers: [
     AppService,
     {
