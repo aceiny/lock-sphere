@@ -21,7 +21,7 @@ export class AuthController {
   async signin(): Promise<ResponseInterface> {
     const data = await this.authService.signin();
     return {
-      message : "Signup succesfully",
+      message : "Signin succesfully",
       status : HttpStatus.CREATED
     }
   }
