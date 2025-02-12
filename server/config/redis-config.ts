@@ -1,15 +1,10 @@
+import { getEnvOrFatal } from "common/utils/env.util";
+import { RedisOptions } from "ioredis";
 import { ConnectionOptions } from "tls";
 
-function getEnvVar(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`${name} environment variable is required.`);
-  }
-  return value;
-}
-export const RedisConfig = {
-  host: getEnvVar("REDIS_HOST"),
-  port: +getEnvVar("REDIS_PORT"),
+export const RedisConfig : RedisOptions = {
+  host: getEnvOrFatal("REDIS_HOST"),
+  port: getEnvOrFatal("REDIS_PORT"),
   /*username: getEnvVar("REDIS_USERNAME"),
   password: getEnvVar("REDIS_PASSWORD"),
   tls: {

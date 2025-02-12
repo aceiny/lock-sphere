@@ -10,12 +10,12 @@ import { CorsConfig } from 'config/cors-config';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { SessionConfig } from 'config/session.config';
+import Redis from 'ioredis';
 
 export async function CreateServer()  : Promise<INestApplication<any>>{
     const server = await NestFactory.create(AppModule);
     
     SetupSwagger(server);
-    
     server.use(session(SessionConfig))
     server.use(passport.initialize());
     server.use(passport.session());
