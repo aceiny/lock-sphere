@@ -12,6 +12,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
   async validateUser(email: string, password: string): Promise<any> {
+    console.log(email , password)
     email = email.trim().toLowerCase()
     const user = await this.userService.findByEmailWithPassword(email);
     if(!user) {
@@ -60,6 +61,10 @@ export class AuthService {
   }
 
   async logout(@Req() request: Request): Promise<any> {
-    return 'true'  
-}
+    request.session.destroy(() => {
+      return {
+        message: 'Logout successful',
+        statusCode: HttpStatus.OK,
+      };
+    });  }
 }

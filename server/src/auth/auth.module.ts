@@ -7,15 +7,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
-import { UserService } from 'src/user/user.service';
+import { PassportConfig } from 'config/passport.config';
+import { Session } from './serializer/session.serializer';
 
 @Module({
   imports: [
-    PassportModule.register({session : true}),
+    PassportModule.register(PassportConfig),
     JwtModule.register({}),  
-      UserModule
+    UserModule
   ],
   controllers: [AuthController],
-  providers: [AuthService  , LocalStrategy , AccessTokenStrategy , RefreshTokenStrategy],
+  providers: [AuthService  , LocalStrategy , AccessTokenStrategy , RefreshTokenStrategy , Session],
 })
 export class AuthModule {}

@@ -8,6 +8,7 @@ import { AppModule } from 'src/app.module';
 import { ValidationPipeConfig } from 'config/validation-pipe.config';
 import { CorsConfig } from 'config/cors-config';
 import * as session from 'express-session';
+import * as passport from 'passport';
 import { SessionConfig } from 'config/session.config';
 
 export async function CreateServer()  : Promise<INestApplication<any>>{
@@ -16,6 +17,8 @@ export async function CreateServer()  : Promise<INestApplication<any>>{
     SetupSwagger(server);
     
     server.use(session(SessionConfig))
+    server.use(passport.initialize());
+    server.use(passport.session());
     server.enableCors(CorsConfig);
     server.useGlobalPipes(
       new ValidationPipe(ValidationPipeConfig),
