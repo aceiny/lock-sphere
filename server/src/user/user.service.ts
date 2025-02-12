@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +11,18 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+
+  async checkUsedEmail(email : string ) : Promise<boolean | void> {
+    const user = await this.userRepository.findOne({
+      where : {
+        email
+      }
+    })
+    if(user) {
+      throw new ConflictException('Email already used')
+    }
+    return false
+  }
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return this.userRepository
       .createQueryBuilder('user')
@@ -25,8 +37,10 @@ export class UserService {
       .addSelect('user.password')
       .getOne();
   }
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    await this.checkUsedEmail(createUserDto.email)
+    const user = this.userRepository.create(createUserDto)
+    return this.userRepository.save(user)
   }
 
   findAll() {

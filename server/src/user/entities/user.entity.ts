@@ -1,4 +1,4 @@
-import { Column, Entity, BeforeInsert, Index, Unique } from 'typeorm';
+import { Column, Entity, BeforeInsert, Index  } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ChronoEntity } from 'abtract/entity.abstract';
 
@@ -15,8 +15,11 @@ export class User extends ChronoEntity {
   password: string;
 
   @Column({ type: 'boolean', default: false })
-  is_mfa_Enabled: boolean;
+  is_mfa_enabled: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  is_email_verfied: boolean
+  
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
