@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthLogStatusEnum } from '../type/auth-log.status.enum';
 
-Entity();
+@Entity()
 export class AuthLog {
   @PrimaryColumn('uuid')
   id: string = uuidv4();

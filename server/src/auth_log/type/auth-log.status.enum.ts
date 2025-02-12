@@ -1,4 +1,4 @@
-export class AuthLogStatusEnum {
-  static readonly SUCCESS = 'SUCCESS';
-  static readonly FAILED = 'FAILED';
+export enum AuthLogStatusEnum {
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED'
 }
