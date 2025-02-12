@@ -11,7 +11,6 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import { SessionConfig } from 'config/session.config';
 import { RedisStore } from 'connect-redis';
-import { getEnvOrFatal } from 'common/utils/env.util';
 
 export async function CreateServer()  : Promise<INestApplication<any>>{
     const server = await NestFactory.create(AppModule);

@@ -7,10 +7,11 @@ import { SessionMiddleware } from 'common/middlewares/session.middleware';
 
 @Module({
   imports : [
-    TypeOrmModule.forFeature([AuthLog])
+    TypeOrmModule.forFeature([AuthLog]),
 ],
   controllers: [AuthLogController],
   providers: [AuthLogService],
+  exports : [AuthLogService]
 })
 export class AuthLogModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {

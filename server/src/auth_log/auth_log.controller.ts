@@ -19,7 +19,7 @@ export class AuthLogController {
     @Query("offset", new DefaultValuePipe(default_offset), ParseIntPipe)
     offset: number,
   ) : Promise<ResponseInterface<PaginatedResponse<AuthLog>>> {
-    const data =  await this.authLogService.getAuthLogs(user.id , page , offset);
+    const data =  await this.authLogService.getPaginatedAuthLogs(user.id , page , offset);
     return {
       message : "Auth Logs fetched successfully",
       status : HttpStatus.OK,

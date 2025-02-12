@@ -16,5 +16,3 @@ export class UserModule implements NestModule {
     consumer.apply(SessionMiddleware).forRoutes(UserController);
   }
 }
-{
-}
