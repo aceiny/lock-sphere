@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { RedisModule } from './redis/redis.module';
 import { MailModule } from './mail/mail.module';
 import { QueueModule } from './queue/queue.module';
+import { AuthLogModule } from './auth_log/auth_log.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { QueueModule } from './queue/queue.module';
     RedisModule,
     MailModule,
     QueueModule,
+    AuthLogModule,
   ],
   controllers: [AppController],
   providers: [

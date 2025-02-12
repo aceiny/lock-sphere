@@ -12,10 +12,10 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Request } from 'express';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
-import { Session } from 'shared/interfaces/session.interface';
 import { ResponseInterface } from 'shared/interfaces/response.interface';
+import { SessionInterface } from 'shared/interfaces/session.interface';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -27,7 +27,7 @@ export class UserController {
   }
 
   @Get()
-  async findAll(@GetUser() user: Session): Promise<ResponseInterface> {
+  async findUser(@GetUser() user: SessionInterface): Promise<ResponseInterface<User>> {
     const data = await this.userService.findOneById(user.id);
     return {
       message: 'User found',

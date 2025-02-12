@@ -1,4 +1,4 @@
-export interface Session {
+export interface SessionInterface {
     id : string ;
     email : string ; 
 }

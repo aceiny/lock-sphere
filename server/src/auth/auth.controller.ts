@@ -19,7 +19,7 @@ export class AuthController {
   @Post('signup')
   async signup(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<ResponseInterface> {
+  ): Promise<ResponseInterface<null>> {
     const data = await this.authService.signup(createUserDto);
     return {
       message: 'Signup succesfully',
@@ -28,7 +28,7 @@ export class AuthController {
   }
   @UseGuards(LocalGuard)
   @Post('signin')
-  async signin(): Promise<ResponseInterface> {
+  async signin(): Promise<ResponseInterface<null>> {
     const data = await this.authService.signin();
     return {
       message: 'Signin succesfully',
@@ -36,7 +36,7 @@ export class AuthController {
     };
   }
   @Post('/signout')
-  async signout(@Req() req: Request): Promise<ResponseInterface> {
+  async signout(@Req() req: Request): Promise<ResponseInterface<null>> {
     const data = await this.authService.signout(req);
     return {
       message: 'Logout succesfully',
