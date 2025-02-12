@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,16 +16,16 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async checkUsedEmail(email : string ) : Promise<boolean | void> {
+  async checkUsedEmail(email: string): Promise<boolean | void> {
     const user = await this.userRepository.findOne({
-      where : {
-        email
-      }
-    })
-    if(user) {
-      throw new ConflictException('Email already used')
+      where: {
+        email,
+      },
+    });
+    if (user) {
+      throw new ConflictException('Email already used');
     }
-    return false
+    return false;
   }
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return this.userRepository
@@ -38,17 +42,25 @@ export class UserService {
       .getOne();
   }
   async create(createUserDto: CreateUserDto) {
-    await this.checkUsedEmail(createUserDto.email)
-    const user = this.userRepository.create(createUserDto)
-    return this.userRepository.save(user)
+    await this.checkUsedEmail(createUserDto.email);
+    const user = this.userRepository.create(createUserDto);
+    return this.userRepository.save(user);
   }
 
   findAll() {
     return `This action returns all user`;
   }
 
-  findOne(id: string) {
-    const userRepository = this.userRepository;
+  async findOneById(id: string) {
+    const user = this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return user;
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {

@@ -1,4 +1,10 @@
-import { BadRequestException, HttpStatus, Injectable, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
@@ -15,13 +21,13 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    @InjectQueue("email-queue") private emailQueue: Queue,
+    @InjectQueue('email-queue') private emailQueue: Queue,
   ) {}
   async validateUser(email: string, password: string): Promise<Session> {
-    console.log(email , password)
-    email = email.trim().toLowerCase()
+    console.log(email, password);
+    email = email.trim().toLowerCase();
     const user = await this.userService.findByEmailWithPassword(email);
-    if(!user) {
+    if (!user) {
       throw new BadRequestException('Invalid credentials');
     }
     const passwordMatch: boolean = await this.passworMatch(
@@ -33,7 +39,7 @@ export class AuthService {
     }
     return {
       id: user.id,
-      email : user.email
+      email: user.email,
     };
   }
   async passworMatch(password: string, hash: string): Promise<boolean> {
@@ -51,37 +57,35 @@ export class AuthService {
       expiresIn: '7d', // Long-lived refresh token
     });
 
-
     return { accessToken, refreshToken };
   }
 
   async signin(): Promise<any> {
-      const mailDto: SendEmailOptions = {
-      to: "yzeraibi2000@gmail.com",
-      subject: "New login to your lock sphere account",
+    const mailDto: SendEmailOptions = {
+      to: 'yzeraibi2000@gmail.com',
+      subject: 'New login to your lock sphere account',
     };
     /*await this.emailQueue.add(
       "new-login",
       { mailDto },
       { attempts: 3, backoff: { type: "exponential", delay: 1000 } },
     );*/
-    return true
+    return true;
   }
-  async signup(createUserDto : CreateUserDto): Promise<any> {
-    return this.userService.create(createUserDto)
+  async signup(createUserDto: CreateUserDto): Promise<any> {
+    return this.userService.create(createUserDto);
   }
-    async signout(request: Request): Promise<boolean> {
-      if (!request.session?.passport) {
-        throw new UnauthorizedException('Session not found');
+  async signout(request: Request): Promise<boolean> {
+    if (!request.session?.passport) {
+      throw new UnauthorizedException('Session not found');
+    }
+
+    request.session.destroy((err) => {
+      if (err) {
+        throw new Error();
       }
-  
-      request.session.destroy((err) => {
-        if (err) {
-          throw new Error();
-        }
-      });
-      request.res.clearCookie(getEnvOrFatal("COOKIE_NAME"));
-      return true
-    }  
-  
+    });
+    request.res.clearCookie(getEnvOrFatal('COOKIE_NAME'));
+    return true;
+  }
 }

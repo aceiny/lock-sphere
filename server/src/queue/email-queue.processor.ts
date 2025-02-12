@@ -1,16 +1,16 @@
-import { Process, Processor } from "@nestjs/bull";
-import { Injectable, Logger } from "@nestjs/common";
-import { Job } from "bull";
-import { MailService } from "src/mail/mail.service";
+import { Process, Processor } from '@nestjs/bull';
+import { Injectable, Logger } from '@nestjs/common';
+import { Job } from 'bull';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
-@Processor("email-queue")
+@Processor('email-queue')
 export class EmailQueueProcessor {
   private readonly logger = new Logger(EmailQueueProcessor.name);
 
   constructor(private readonly mailService: MailService) {}
 
-  @Process("new-login")
+  @Process('new-login')
   async handleNewLogin(job: Job) {
     try {
       this.logger.debug(`Processing new login email job ${job.id}`);
@@ -25,6 +25,4 @@ export class EmailQueueProcessor {
       throw error;
     }
   }
-
- 
 }

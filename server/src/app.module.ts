@@ -20,7 +20,7 @@ import { QueueModule } from './queue/queue.module';
     AuthModule,
     RedisModule,
     MailModule,
-    QueueModule
+    QueueModule,
   ],
   controllers: [AppController],
   providers: [

@@ -14,11 +14,17 @@ import { QueueModule } from 'src/queue/queue.module';
 @Module({
   imports: [
     PassportModule.register(PassportConfig),
-    JwtModule.register({}),  
+    JwtModule.register({}),
     UserModule,
-    QueueModule
+    QueueModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService  , LocalStrategy , AccessTokenStrategy , RefreshTokenStrategy , Session],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+    Session,
+  ],
 })
 export class AuthModule {}

@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   Req,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
+import { GetUser } from 'common/decorators/auth/get-user.decorator';
+import { Session } from 'shared/interfaces/session.interface';
+import { ResponseInterface } from 'shared/interfaces/response.interface';
 
 @Controller('user')
 export class UserController {
@@ -22,27 +26,22 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Get("")
-  findAll(
-    @Req() req : Request
-  ) {
-    console.log(req.session)
-    console.log("sessionId" , req.sessionID)
-    console.log("session store" , req.sessionStore)
-    return "hi from get all users";
+  @Get()
+  async findAll(@GetUser() user: Session): Promise<ResponseInterface> {
+    const data = await this.userService.findOneById(user.id);
+    return {
+      message: 'User found',
+      status: HttpStatus.OK,
+      data,
+    };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
-  }
-
-  @Patch(':id')
+  @Patch()
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete()
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
   }

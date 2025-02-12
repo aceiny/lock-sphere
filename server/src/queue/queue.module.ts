@@ -1,8 +1,8 @@
-import { BullModule } from "@nestjs/bull";
-import { Module } from "@nestjs/common";
-import { EmailQueueProcessor } from "./email-queue.processor";
-import { RedisConfig } from "config/redis-config";
-import { MailModule } from "src/mail/mail.module";
+import { BullModule } from '@nestjs/bull';
+import { Module } from '@nestjs/common';
+import { EmailQueueProcessor } from './email-queue.processor';
+import { RedisConfig } from 'config/redis-config';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
@@ -10,7 +10,7 @@ import { MailModule } from "src/mail/mail.module";
       redis: RedisConfig,
     }),
     BullModule.registerQueue({
-      name: "email-queue",
+      name: 'email-queue',
     }),
     MailModule,
   ],
