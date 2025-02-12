@@ -2,7 +2,7 @@ export const ThrottlerConfig = [
   {
     name: 'strict',    // For sensitive endpoints (auth, password reset, etc)
     ttl: 60000,       // 1 minute
-    limit: 5,         // 5 requests per minute
+    limit: 60,         // 5 requests per minute
   },
   {
     name: 'standard', // For regular API endpoints

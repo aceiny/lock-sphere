@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable, Req } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, Req, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
@@ -8,6 +8,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { SendEmailOptions } from 'src/mail/interfaces/send-email.interface';
 import { Session } from 'shared/interfaces/session.interface';
+import { getEnvOrFatal } from 'common/utils/env.util';
 
 @Injectable()
 export class AuthService {
@@ -69,12 +70,18 @@ export class AuthService {
   async signup(createUserDto : CreateUserDto): Promise<any> {
     return this.userService.create(createUserDto)
   }
-
-  async logout(@Req() request: Request): Promise<any> {
-    request.session.destroy(() => {
-      return {
-        message: 'Logout successful',
-        statusCode: HttpStatus.OK,
-      };
-    });  }
+    async signout(request: Request): Promise<boolean> {
+      if (!request.session?.passport) {
+        throw new UnauthorizedException('Session not found');
+      }
+  
+      request.session.destroy((err) => {
+        if (err) {
+          throw new Error();
+        }
+      });
+      request.res.clearCookie(getEnvOrFatal("COOKIE_NAME"));
+      return true
+    }  
+  
 }
