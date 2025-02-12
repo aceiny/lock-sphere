@@ -7,6 +7,7 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { SendEmailOptions } from 'src/mail/interfaces/send-email.interface';
+import { Session } from 'shared/interfaces/session.interface';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectQueue("email-queue") private emailQueue: Queue,
   ) {}
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<Session> {
     console.log(email , password)
     email = email.trim().toLowerCase()
     const user = await this.userService.findByEmailWithPassword(email);
@@ -31,8 +32,7 @@ export class AuthService {
     }
     return {
       id: user.id,
-      email: user.email,
-      name: user.name,
+      email : user.email
     };
   }
   async passworMatch(password: string, hash: string): Promise<boolean> {
@@ -59,11 +59,11 @@ export class AuthService {
       to: "yzeraibi2000@gmail.com",
       subject: "New login to your lock sphere account",
     };
-    await this.emailQueue.add(
+    /*await this.emailQueue.add(
       "new-login",
       { mailDto },
       { attempts: 3, backoff: { type: "exponential", delay: 1000 } },
-    );
+    );*/
     return true
   }
   async signup(createUserDto : CreateUserDto): Promise<any> {

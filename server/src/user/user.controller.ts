@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Request } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -20,9 +22,14 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Get("")
+  findAll(
+    @Req() req : Request
+  ) {
+    console.log(req.session)
+    console.log("sessionId" , req.sessionID)
+    console.log("session store" , req.sessionStore)
+    return "hi from get all users";
   }
 
   @Get(':id')
