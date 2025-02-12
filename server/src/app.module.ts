@@ -9,6 +9,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from './redis/redis.module';
+import { MailModule } from './mail/mail.module';
+import { QueueModule } from './queue/queue.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { RedisModule } from './redis/redis.module';
     UserModule,
     AuthModule,
     RedisModule,
+    MailModule,
+    QueueModule
   ],
   controllers: [AppController],
   providers: [

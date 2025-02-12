@@ -4,12 +4,16 @@ import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { SendEmailOptions } from 'src/mail/interfaces/send-email.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    @InjectQueue("email-queue") private emailQueue: Queue,
   ) {}
   async validateUser(email: string, password: string): Promise<any> {
     console.log(email , password)
@@ -51,10 +55,16 @@ export class AuthService {
   }
 
   async signin(): Promise<any> {
-    return {
-      message: 'Login successful',
-      statusCode: HttpStatus.OK,
+      const mailDto: SendEmailOptions = {
+      to: "yzeraibi2000@gmail.com",
+      subject: "New login to your lock sphere account",
     };
+    await this.emailQueue.add(
+      "new-login",
+      { mailDto },
+      { attempts: 3, backoff: { type: "exponential", delay: 1000 } },
+    );
+    return true
   }
   async signup(createUserDto : CreateUserDto): Promise<any> {
     return this.userService.create(createUserDto)

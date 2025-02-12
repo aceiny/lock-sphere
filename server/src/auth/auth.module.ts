@@ -9,12 +9,14 @@ import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { PassportConfig } from 'config/passport.config';
 import { Session } from './serializer/session.serializer';
+import { QueueModule } from 'src/queue/queue.module';
 
 @Module({
   imports: [
     PassportModule.register(PassportConfig),
     JwtModule.register({}),  
-    UserModule
+    UserModule,
+    QueueModule
   ],
   controllers: [AuthController],
   providers: [AuthService  , LocalStrategy , AccessTokenStrategy , RefreshTokenStrategy , Session],
