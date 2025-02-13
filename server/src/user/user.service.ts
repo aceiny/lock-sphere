@@ -46,9 +46,14 @@ export class UserService {
     const user = this.userRepository.create(createUserDto);
     return this.userRepository.save(user);
   }
-
-  findAll() {
-    return `This action returns all user`;
+  async changeTfaState(id: string , state : boolean) {
+    const user = await this.findOneById(id);
+    user.is_tfa_enabled = state;
+    return this.userRepository.save(user);
+  }
+  async changeTfaSecret(user: User , secret : string) {
+    user.tfa_secret = secret;
+    return this.userRepository.save(user);
   }
 
   async findOneById(id: string) {
@@ -67,7 +72,9 @@ export class UserService {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const user = await this.findOneById(id);
+    // disable all sessions of user need to be done 
+    return this.userRepository.remove(user);
   }
 }

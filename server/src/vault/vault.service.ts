@@ -100,7 +100,7 @@ export class VaultService {
     const vault = await this.findOneVault(userId , id , true);
     return this.vaultService.remove(vault);
   }
-  async removeCategoryFromVault(userId: string, vaultId: string, categoryId: string) {
+  async removeCategoryFromVault(userId: string, vaultId: string, categoryId: string) : Promise<boolean> {
     const vault = await this.findOneVault(userId, vaultId);
     const category = await this.categoryService.findOneCategory(userId, categoryId);
 
@@ -125,7 +125,7 @@ export class VaultService {
         .of(vault)
         .remove(category);
 
-    return { message: "Category successfully removed from Vault" };
+    return true;
 }
 
 }

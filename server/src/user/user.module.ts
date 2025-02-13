@@ -4,11 +4,12 @@ import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { SessionMiddleware } from 'common/middlewares/session.middleware';
+import { TfaAuthentificationService } from './tfa-authentification.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService , TfaAuthentificationService],
   exports: [UserService],
 })
 export class UserModule implements NestModule {
