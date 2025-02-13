@@ -9,10 +9,10 @@ import { SessionMiddleware } from 'common/middlewares/session.middleware';
   imports : [TypeOrmModule.forFeature([Category])],
   controllers: [CategoryController],
   providers: [CategoryService],
+  exports : [CategoryService]
 })
 export class CategoryModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SessionMiddleware).forRoutes(CategoryController);
   }
 }
-{}

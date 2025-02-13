@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class CategoryService {
@@ -29,6 +29,11 @@ export class CategoryService {
     return this.categoryRepository.save(category);
   }
 
+  async findBulkCategories(userId : string , ids : string[]) {
+    return this.categoryRepository.find({
+      where: { id: In(ids), user: { id: userId } },
+  });
+  }
   async findAllUserCategories(userId : string) {
     return this.categoryRepository.find({
       where : {
@@ -37,9 +42,10 @@ export class CategoryService {
     })
   }
 
-  async findOne(id: string) {
+  async findOneCategory(userId : string , id: string) {
     const category = await this.categoryRepository.findOneBy({
-      id
+      id,
+      user : {id : userId}
     });
     if(!category){
       throw new NotFoundException('Category not found');

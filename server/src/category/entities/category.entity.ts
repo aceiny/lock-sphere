@@ -7,6 +7,6 @@ export class Category extends ChronoEntity{
     @Column()
     name: string;
 
-    @ManyToOne(()=>User, {onDelete : 'CASCADE'})
+    @ManyToOne(()=>User, {nullable : false , onDelete : 'CASCADE'})
     user: User;
 }

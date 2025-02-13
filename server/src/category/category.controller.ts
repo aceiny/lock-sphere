@@ -44,8 +44,10 @@ export class CategoryController {
   }
 
   @Get('/:id')
-  async findOne(@Param('id' ,new ParseUUIDPipe() ) id: string) : Promise<ResponseInterface<Category>> {
-    const data = await this.categoryService.findOne(id);
+  async findOne(
+    @GetUser() user : SessionInterface,
+    @Param('id' ,new ParseUUIDPipe() ) id: string) : Promise<ResponseInterface<Category>> {
+    const data = await this.categoryService.findOneCategory(user.id , id);
     return {
       message : "Categories fetched successfully",
       status : HttpStatus.OK,

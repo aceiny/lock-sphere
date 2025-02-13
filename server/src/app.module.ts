@@ -13,6 +13,7 @@ import { MailModule } from './mail/mail.module';
 import { QueueModule } from './queue/queue.module';
 import { AuthLogModule } from './auth_log/auth_log.module';
 import { CategoryModule } from './category/category.module';
+import { VaultModule } from './vault/vault.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CategoryModule } from './category/category.module';
     QueueModule,
     AuthLogModule,
     CategoryModule,
+    VaultModule,
   ],
   controllers: [AppController],
   providers: [
