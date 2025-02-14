@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { UserService } from './user.service';
 import { RedisService } from 'src/redis/redis.service';
@@ -16,8 +12,9 @@ import {
   TFA_ISSUER,
   TFA_SECRET_TTL,
 } from 'shared/constants/tfa.constant';
-import { VerifyTfaDto } from './dto/verify-tfa.dto';
+import { VerifyTfaDto } from './types/verify-tfa.dto';
 import { randomBytes } from 'crypto';
+import { TfaState } from './types/tfa-state.enum';
 
 @Injectable()
 export class TfaAuthentificationService {
@@ -46,16 +43,34 @@ export class TfaAuthentificationService {
     return `tfa:challenge:verification:${userId}`;
   }
   //enables and disables 2fa for the user
-  async enableTfa(userId: string) {
-    // initiate the 2FA enabling process
-    await this.initiateTfaEnabling(userId);
+  async enableTfa(userId: string, token: string) {
+    // check to see if the user is pending tfa activation
+    const user = await this.userService.findOneById(userId);
+    if (user.tfa_state != TfaState.PENDING) {
+      throw new ConflictException('2FA is not pending for this user');
+    }
+    // verify the token
+    /// fetch the secret from redis and verify the token
+    const user_tfa_secret = await this.redisService.GetKey(
+      this.getTfaRedisSecretKey(userId),
+    );
+    /// check that the token is valid
+    const is_valid = authenticator.verify({
+      token,
+      secret: user_tfa_secret,
+    });
+    if (!is_valid) {
+      throw new ConflictException('Invalid 2FA code please try again');
+    }
+    // token is valid means user has successfully passed the initiate tfa verification
+    // change the user 2FA state to enabled
+    await this.userService.changeTfaState(userId, TfaState.ENABLED);
     // change the user 2FA enabled state to true
-    await this.userService.changeTfaState(userId, true);
     return true;
   }
   async disableTfa(userId: string) {
     // change the user 2FA state to false
-    await this.userService.changeTfaState(userId, false);
+    await this.userService.changeTfaState(userId, TfaState.DISABLED);
 
     // delete the 2FA secret and attempts key from redis if exists
     await this.redisService.DeleteKey(this.getTfaRedisSecretKey(userId));
@@ -65,16 +80,16 @@ export class TfaAuthentificationService {
     return true;
   }
   async initiateTfaEnabling(userId: string) {
-    // check if the user has already enabled 2FA and has a secret
-    if (await this.redisService.GetKey(this.getTfaRedisSecretKey(userId))) { // maybe overwrite the secret
-      throw new InternalServerErrorException(
-        'User already has a 2FA secret , please disable and re-enable 2FA',
-      );
+    const user = await this.userService.findOneById(userId);
+    if (user.tfa_state == TfaState.ENABLED) {
+      throw new ConflictException('User already have tfa enabled');
     }
 
     // nothing is wrong , generate a new secret for the user and return the qr code
     const { qr_code, secret, otp_uri } = await this.generateSecret(userId);
-    return { qr_code, secret, otp_uri };
+    await this.redisService.SetKey(this.getTfaRedisSecretKey(userId), secret);
+    await this.userService.changeTfaState(userId, TfaState.PENDING);
+    return { qr_code, otp_uri };
   }
   async generateSecret(userId: string) {
     // generate a secret key for the user
@@ -99,13 +114,12 @@ export class TfaAuthentificationService {
     };
   }
 
-
   async verifyTfaToken(userId: string, verifyTokenDto: VerifyTfaDto) {
     // check if the user has exceeded the verification attempts
     await this.checkChallengeVerifcationRateLimit(userId);
     // check if 2FA is enabled for the user
     const user = await this.userService.findOneById(userId);
-    if (!user.is_tfa_enabled) {
+    if (user.tfa_state != TfaState.ENABLED) {
       throw new ConflictException('2FA is not enabled for this user');
     }
 
@@ -151,7 +165,7 @@ export class TfaAuthentificationService {
       challenge_token,
       this.CHALLENGE_CREATION_WINDOW,
     );
-      // Increment the creation attempts counter as this is an attempt
+    // Increment the creation attempts counter as this is an attempt
     await this.incrementChallangeCreationAttempts(userId);
 
     return challenge_token;

@@ -16,9 +16,9 @@ export class RedisService {
 
   async SetKey(key: string, value: string, ttl?: number) {
     if (ttl) {
-      await this.redisClient.set(key, value, 'EX', ttl);
+      await this.redisClient.set(key, JSON.stringify(value), 'EX', ttl);
     } else {
-      await this.redisClient.set(key, value);
+      await this.redisClient.set(key, JSON.stringify(value));
     }
   }
   async IncrementKey(key: string): Promise<number> {

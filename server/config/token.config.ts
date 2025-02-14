@@ -1,6 +1,2 @@
-export const AccessTokenConfig = {
-    
-}
-export const RefreshTokenConfig = {
-    
-}
+export const AccessTokenConfig = {};
+export const RefreshTokenConfig = {};

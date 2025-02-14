@@ -9,13 +9,15 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './types/update-user.dto';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
 import { ResponseInterface } from 'shared/interfaces/response.interface';
 import { SessionInterface } from 'shared/interfaces/session.interface';
 import { User } from './entities/user.entity';
 import { TfaAuthentificationService } from './tfa-authentification.service';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { VerifyTfaDto } from './types/verify-tfa.dto';
+import { verify } from 'crypto';
 
 @ApiTags('User')
 @Controller('user')
@@ -39,13 +41,32 @@ export class UserController {
     };
   }
 
+  @ApiOperation({ summary: 'initiate  tfa enabling for user' })
+  @ApiCookieAuth('session-auth')
+  @Post('/initiate-tfa')
+  async initiateTfaEnabling(
+    @GetUser() user: SessionInterface,
+  ): Promise<ResponseInterface<any>> {
+    const data = await this.tfaAuthentificationService.initiateTfaEnabling(
+      user.id,
+    );
+    return {
+      message: 'Two factor authentication is now pending verifaction',
+      status: HttpStatus.OK,
+      data,
+    };
+  }
   @ApiOperation({ summary: 'enable tfa for user' })
   @ApiCookieAuth('session-auth')
   @Post('/enable-tfa')
   async enableTfa(
     @GetUser() user: SessionInterface,
+    @Body() VerifyTfaDto: VerifyTfaDto,
   ): Promise<ResponseInterface<User>> {
-    const data = await this.tfaAuthentificationService.enableTfa(user.id);
+    const data = await this.tfaAuthentificationService.enableTfa(
+      user.id,
+      VerifyTfaDto.token,
+    );
     return {
       message: 'Two factor authentication enabled',
       status: HttpStatus.OK,

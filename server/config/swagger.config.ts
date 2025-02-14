@@ -13,7 +13,7 @@ export const SetupSwagger = (app: INestApplication): void => {
         in: 'cookie',
         description: 'Session cookie authentication',
       },
-      'session-auth'
+      'session-auth',
     )
     .addServer('http://localhost:3000', 'Local environment')
     .build();
@@ -21,7 +21,7 @@ export const SetupSwagger = (app: INestApplication): void => {
   const document: OpenAPIObject = SwaggerModule.createDocument(app, config);
 
   // Apply security globally
-  document.security = [{'session-auth': [] }];
+  document.security = [{ 'session-auth': [] }];
 
   SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: {

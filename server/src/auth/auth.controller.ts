@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalGuard } from 'common/guards/auth/local.guard';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from 'src/user/types/create-user.dto';
 import { ResponseInterface } from 'shared/interfaces/response.interface';
 import { Request } from 'express';
 import { SessionInterface } from 'shared/interfaces/session.interface';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
-import { VerifyTfaDto } from 'src/user/dto/verify-tfa.dto';
+import { VerifyTfaDto } from 'src/user/types/verify-tfa.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Auth')
@@ -22,7 +22,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({
-    summary : 'Signup a new user',
+    summary: 'Signup a new user',
   })
   @Post('signup')
   async signup(
@@ -35,7 +35,7 @@ export class AuthController {
     };
   }
   @ApiOperation({
-    summary : 'Signin a user',
+    summary: 'Signin a user',
   })
   @ApiResponse({
     status: 201,
@@ -43,7 +43,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 401,
-    description: 'invalid credentials or requires two factor authentication', 
+    description: 'invalid credentials or requires two factor authentication',
   })
   @UseGuards(LocalGuard)
   @Post('signin')
@@ -59,7 +59,7 @@ export class AuthController {
   }
 
   @ApiOperation({
-    summary : 'Signout a user',
+    summary: 'Signout a user',
   })
   @Post('/signout')
   async signout(@Req() req: Request): Promise<ResponseInterface<null>> {
@@ -71,7 +71,7 @@ export class AuthController {
   }
 
   @ApiOperation({
-    summary : 'Verify two factor authentication',
+    summary: 'Verify two factor authentication',
   })
   @Post('/verify-tfa')
   async verifyTfa(

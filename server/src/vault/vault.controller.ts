@@ -38,11 +38,11 @@ export class VaultController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Vault created successfully'
+    description: 'Vault created successfully',
   })
   @ApiResponse({
     status: 404,
-    description: 'One or more categories not found'
+    description: 'One or more categories not found',
   })
   @Post()
   async create(

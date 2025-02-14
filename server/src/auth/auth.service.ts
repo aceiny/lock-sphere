@@ -7,7 +7,7 @@ import {
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from 'src/user/types/create-user.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { SendEmailOptions } from 'src/mail/interfaces/send-email.interface';
@@ -17,7 +17,8 @@ import { AuthLogService } from 'src/auth_log/auth_log.service';
 import { AuthLogStatusEnum } from 'src/auth_log/type/auth-log.status.enum';
 import * as geoip from 'geoip-lite';
 import { TfaAuthentificationService } from 'src/user/tfa-authentification.service';
-import { VerifyTfaDto } from 'src/user/dto/verify-tfa.dto';
+import { VerifyTfaDto } from 'src/user/types/verify-tfa.dto';
+import { TfaState } from 'src/user/types/tfa-state.enum';
 @Injectable()
 export class AuthService {
   constructor(
@@ -43,12 +44,12 @@ export class AuthService {
     if (!passwordMatch) {
       throw new BadRequestException('Invalid credentials');
     }
-    if(user.is_tfa_enabled){
+    if (user.tfa_state == TfaState.ENABLED) {
       await this.tfaAuthentificationService.generateMfaTokenChallenge(user.id);
       throw new UnauthorizedException({
         message: 'Two factor authentication required',
         tfa_required: true,
-      })
+      });
     }
     return {
       id: user.id,
@@ -56,9 +57,7 @@ export class AuthService {
       name: user.name,
     };
   }
-  async verifyTfa(req: Request, verifyTfaDto:  VerifyTfaDto): Promise<any> {
-
-  }
+  async verifyTfa(req: Request, verifyTfaDto: VerifyTfaDto): Promise<any> {}
   async signin(req: Request, user: SessionInterface): Promise<any> {
     const mailDto: SendEmailOptions = {
       to: user.email,

@@ -1,3 +1,3 @@
 export const PassportConfig = {
-    session : true
-}
+  session: true,
+};

@@ -3,11 +3,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './types/create-user.dto';
+import { UpdateUserDto } from './types/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { TfaState } from './types/tfa-state.enum';
 
 @Injectable()
 export class UserService {
@@ -46,21 +47,21 @@ export class UserService {
     const user = this.userRepository.create(createUserDto);
     return this.userRepository.save(user);
   }
-  async changeTfaState(id: string, state: boolean): Promise<boolean> {
+  async changeTfaState(id: string, state: TfaState): Promise<boolean> {
     const user = await this.findOneById(id);
-    if (user.is_tfa_enabled === state) {
+    if (user.tfa_state === state) {
       switch (state) {
-        case true:
+        case TfaState.ENABLED:
           throw new ConflictException(
             'Two factor authentication already enabled',
           );
-        case false:
+        case TfaState.DISABLED:
           throw new ConflictException(
             'Two factor authentication already disabled',
           );
       }
     }
-    user.is_tfa_enabled = state;
+    user.tfa_state = state;
     await this.userRepository.save(user);
     return true;
   }

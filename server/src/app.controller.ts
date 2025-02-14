@@ -7,8 +7,9 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @ApiOperation({
-    summary : "main page entery" ,
-    description : "if server is up and working it will return a welcome message "
+    summary: 'main page entery',
+    description:
+      'if server is up and working it will return a welcome message ',
   })
   @Get()
   getHello(): string {

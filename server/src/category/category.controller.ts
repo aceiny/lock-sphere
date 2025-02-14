@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete, ParseUUIDPipe, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  HttpStatus,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
@@ -48,7 +57,6 @@ export class CategoryController {
     status: 200,
     description: 'Categories fetched successfully',
   })
-
   @Get()
   async findAll(
     @GetUser() user: SessionInterface,
@@ -62,15 +70,15 @@ export class CategoryController {
   }
 
   @ApiOperation({
-    summary : "find category by id",
+    summary: 'find category by id',
   })
   @ApiResponse({
     status: 200,
-    description: 'Category fetched successfully'
+    description: 'Category fetched successfully',
   })
   @ApiResponse({
     status: 404,
-    description: 'Category not found'
+    description: 'Category not found',
   })
   @Get('/:id')
   async findOne(
