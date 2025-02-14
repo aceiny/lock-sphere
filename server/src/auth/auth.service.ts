@@ -16,10 +16,13 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
 import { AuthLogService } from 'src/auth_log/auth_log.service';
 import { AuthLogStatusEnum } from 'src/auth_log/type/auth-log.status.enum';
 import * as geoip from 'geoip-lite';
+import { TfaAuthentificationService } from 'src/user/tfa-authentification.service';
+import { VerifyTfaDto } from 'src/user/dto/verify-tfa.dto';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
+    private readonly tfaAuthentificationService: TfaAuthentificationService,
     private readonly authLogService: AuthLogService,
     @InjectQueue('email-queue') private emailQueue: Queue,
   ) {}
@@ -40,12 +43,21 @@ export class AuthService {
     if (!passwordMatch) {
       throw new BadRequestException('Invalid credentials');
     }
-    /* validate mfa and other security logique */
+    if(user.is_tfa_enabled){
+      await this.tfaAuthentificationService.generateMfaTokenChallenge(user.id);
+      throw new UnauthorizedException({
+        message: 'Two factor authentication required',
+        tfa_required: true,
+      })
+    }
     return {
       id: user.id,
       email: user.email,
       name: user.name,
     };
+  }
+  async verifyTfa(req: Request, verifyTfaDto:  VerifyTfaDto): Promise<any> {
+
   }
   async signin(req: Request, user: SessionInterface): Promise<any> {
     const mailDto: SendEmailOptions = {

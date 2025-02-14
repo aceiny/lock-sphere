@@ -13,6 +13,8 @@ import { ResponseInterface } from 'shared/interfaces/response.interface';
 import { Request } from 'express';
 import { SessionInterface } from 'shared/interfaces/session.interface';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
+import { Verify } from 'crypto';
+import { VerifyTfaDto } from 'src/user/dto/verify-tfa.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -45,6 +47,17 @@ export class AuthController {
     const data = await this.authService.signout(req);
     return {
       message: 'Logout succesfully',
+      status: HttpStatus.OK,
+    };
+  }
+  @Post('/verify-tfa')
+  async verifyTfa(
+    @Req() req: Request,
+    @Body() verifyTfaDto: VerifyTfaDto,
+  ): Promise<ResponseInterface<null>> {
+    const data = await this.authService.verifyTfa(req, verifyTfaDto);
+    return {
+      message: 'Two factor authentication verified',
       status: HttpStatus.OK,
     };
   }

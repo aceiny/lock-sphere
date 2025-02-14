@@ -11,7 +11,7 @@ import { RedisModule } from 'src/redis/redis.module';
   imports: [TypeOrmModule.forFeature([User]), RedisModule],
   controllers: [UserController],
   providers: [UserService, TfaAuthentificationService],
-  exports: [UserService],
+  exports: [UserService , TfaAuthentificationService],
 })
 export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

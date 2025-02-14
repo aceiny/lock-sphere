@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { UserService } from './user.service';
 import { RedisService } from 'src/redis/redis.service';
@@ -17,6 +21,9 @@ import { randomBytes } from 'crypto';
 
 @Injectable()
 export class TfaAuthentificationService {
+  /* to do :
+  encrypt the secret key before saving it in redis  
+  */
   private readonly TFA_ISSUER = TFA_ISSUER;
   private readonly TFA_SECRET_TTL = TFA_SECRET_TTL;
   private readonly CHALLENGE_CREATION_LIMIT = CHALLENGE_CREATION_LIMIT;
@@ -28,8 +35,8 @@ export class TfaAuthentificationService {
     private readonly userService: UserService,
     private readonly redisService: RedisService,
   ) {}
-  private getTfaRedisKey(userId: string): string {
-    return `tfa:${userId}`;
+  private getTfaRedisSecretKey(userId: string): string {
+    return `tfa:secret:${userId}`;
   }
   private getChallengeCreationKey(userId: string): string {
     return `tfa:challenge:creation:${userId}`;
@@ -37,6 +44,37 @@ export class TfaAuthentificationService {
 
   private getChallengeVerificationKey(userId: string): string {
     return `tfa:challenge:verification:${userId}`;
+  }
+  //enables and disables 2fa for the user
+  async enableTfa(userId: string) {
+    // initiate the 2FA enabling process
+    await this.initiateTfaEnabling(userId);
+    // change the user 2FA enabled state to true
+    await this.userService.changeTfaState(userId, true);
+    return true;
+  }
+  async disableTfa(userId: string) {
+    // change the user 2FA state to false
+    await this.userService.changeTfaState(userId, false);
+
+    // delete the 2FA secret and attempts key from redis if exists
+    await this.redisService.DeleteKey(this.getTfaRedisSecretKey(userId));
+    await this.redisService.DeleteKey(this.getChallengeVerificationKey(userId));
+    await this.redisService.DeleteKey(this.getChallengeCreationKey(userId));
+
+    return true;
+  }
+  async initiateTfaEnabling(userId: string) {
+    // check if the user has already enabled 2FA and has a secret
+    if (await this.redisService.GetKey(this.getTfaRedisSecretKey(userId))) { // maybe overwrite the secret
+      throw new InternalServerErrorException(
+        'User already has a 2FA secret , please disable and re-enable 2FA',
+      );
+    }
+
+    // nothing is wrong , generate a new secret for the user and return the qr code
+    const { qr_code, secret, otp_uri } = await this.generateSecret(userId);
+    return { qr_code, secret, otp_uri };
   }
   async generateSecret(userId: string) {
     // generate a secret key for the user
@@ -50,7 +88,7 @@ export class TfaAuthentificationService {
 
     // save the secret key in redis
     await this.redisService.SetKey(
-      this.getTfaRedisKey(userId),
+      this.getTfaRedisSecretKey(userId),
       secret,
       this.TFA_SECRET_TTL,
     );
@@ -61,17 +99,6 @@ export class TfaAuthentificationService {
     };
   }
 
-  async initiateTfaEnabling(userId: string) {
-    // check if the user has already enabled 2FA and has a secret
-    const user = await this.userService.findOneById(userId);
-    if (
-      !(await this.redisService.GetKey(`tfa:${userId}`)) &&
-      user.is_tfa_enabled
-    ) {
-      const { qr_code, secret } = await this.generateSecret(userId);
-      return { qr_code, secret };
-    }
-  }
 
   async verifyTfaToken(userId: string, verifyTokenDto: VerifyTfaDto) {
     // check if the user has exceeded the verification attempts
@@ -84,11 +111,11 @@ export class TfaAuthentificationService {
 
     // get user 2FA secret
     const user_tfa_secret = await this.redisService.GetKey(
-      this.getTfaRedisKey(userId),
+      this.getTfaRedisSecretKey(userId),
     );
     if (!user_tfa_secret) {
       // Generate a new secret and ask the user to re-verify
-      const { qr_code, secret } = await this.generateSecret(userId);
+      const { qr_code } = await this.generateSecret(userId);
       throw new ConflictException({
         message: '2FA secret expired or not found. Please re-scan the QR code.',
         qr_code,
@@ -113,7 +140,23 @@ export class TfaAuthentificationService {
     return true;
   }
 
-  // creates a new tfa challenge for the user for exmaple a user login and logout then relogin this means two new challenges has been created
+  async generateMfaTokenChallenge(userId: string) {
+    // check if the user has exceeded the creation attempts limit
+    await this.checkChallengeCreationRateLimit(userId);
+    // generate a challenge token
+    const challenge_token = randomBytes(32).toString('hex');
+    // save the challenge token in redis
+    await this.redisService.SetKey(
+      this.getChallengeCreationKey(userId),
+      challenge_token,
+      this.CHALLENGE_CREATION_WINDOW,
+    );
+      // Increment the creation attempts counter as this is an attempt
+    await this.incrementChallangeCreationAttempts(userId);
+
+    return challenge_token;
+  }
+
   private async checkChallengeCreationRateLimit(
     userId: string,
   ): Promise<boolean | void> {
@@ -128,7 +171,6 @@ export class TfaAuthentificationService {
     return true;
   }
 
-  // create a new tfa challenge solving attempt for the user , exmaple a user login and submit the 2fa if it is wrong he then try  to resubmit the code on same 2fa this means two new challenges has been created
   private async checkChallengeVerifcationRateLimit(
     userId: string,
   ): Promise<void> {
@@ -166,29 +208,5 @@ export class TfaAuthentificationService {
     } else {
       await this.redisService.IncrementKey(key);
     }
-  }
-  async generateMfaTokenChallenge(userId: string) {
-    // no need to check if 2FA is enabled as this function will be called inside the login function
-    // generate a challenge token
-    const challenge_token = randomBytes(32).toString('hex');
-  }
-
-  //enables and disables 2fa for the user
-  async enableTfa(userId: string) {
-    // change the user 2FA state to true
-    await this.userService.changeTfaState(userId, true);
-
-    // initiate the 2FA enabling process
-    await this.initiateTfaEnabling(userId);
-    return true;
-  }
-  async disableTfa(userId: string) {
-    // change the user 2FA state to false
-    await this.userService.changeTfaState(userId, false);
-
-    // delete the 2FA secret and attempts key from redis
-    await this.redisService.DeleteKey(this.getTfaRedisKey(userId));
-    await this.redisService.DeleteKey(this.getChallengeVerificationKey(userId));
-    return true;
   }
 }

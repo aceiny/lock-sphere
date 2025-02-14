@@ -1,4 +1,4 @@
-import { Matches } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class VerifyTfaDto {
   @Matches(/^\d{6}$/)
