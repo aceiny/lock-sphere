@@ -1,27 +1,16 @@
 "use client";
 import * as React from "react"
+import { Suspense } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Shield, Database, User, SettingsIcon, Activity } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation"
-import { useSignout } from "@/lib/api/auth"
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils"
 import SettingsActivity from "@/components/settings/SettingsActivity"
 import SettingsPreferences from "@/components/settings/SettingsPreferences"
 import SettingsSecurity from "@/components/settings/SettingsSecurity"
 import SettingsData from "@/components/settings/SettingsData"
 import SettingsProfile from "@/components/settings/SettingsProfile";
-
 
 const sections = [
   {
@@ -51,7 +40,7 @@ const sections = [
   },
 ]
 
-export default function SettingsPage() {
+function SettingsContent() {
   const searchParams = useSearchParams()
   const [activeSection, setActiveSection] = React.useState(searchParams.get("section") || "profile")
 
@@ -61,7 +50,6 @@ export default function SettingsPage() {
       setActiveSection(section)
     }
   }, [searchParams])
-
 
   return (
     <div className="space-y-6">
@@ -124,6 +112,13 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SettingsContent />
+    </Suspense>
+  );
+}
