@@ -6,10 +6,10 @@ import { Category } from './entities/category.entity';
 import { SessionMiddleware } from 'common/middlewares/session.middleware';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Category])],
+  imports: [TypeOrmModule.forFeature([Category])],
   controllers: [CategoryController],
   providers: [CategoryService],
-  exports : [CategoryService]
+  exports: [CategoryService],
 })
 export class CategoryModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

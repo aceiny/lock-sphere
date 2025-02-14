@@ -1,4 +1,4 @@
 export class TfaTokenDto {
-    token: string;
-    secret: string;
+  token: string;
+  secret: string;
 }

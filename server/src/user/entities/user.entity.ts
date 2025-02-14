@@ -20,10 +20,7 @@ export class User extends ChronoEntity {
 
   @Column({ type: 'boolean', default: false })
   is_email_verified: boolean;
-  
-  @Column({ nullable: true })
-  @Exclude()
-  tfa_secret : string;
+
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);

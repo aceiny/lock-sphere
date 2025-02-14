@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,7 +21,7 @@ import { TfaAuthentificationService } from './tfa-authentification.service';
 export class UserController {
   constructor(
     private readonly tfaAuthentificationService: TfaAuthentificationService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
   @Post()
@@ -21,7 +30,9 @@ export class UserController {
   }
 
   @Get()
-  async findUser(@GetUser() user: SessionInterface): Promise<ResponseInterface<User>> {
+  async findUser(
+    @GetUser() user: SessionInterface,
+  ): Promise<ResponseInterface<User>> {
     const data = await this.userService.findOneById(user.id);
     return {
       message: 'User found',
@@ -30,7 +41,9 @@ export class UserController {
     };
   }
   @Post('/enable-tfa')
-  async enableTfa(@GetUser() user: SessionInterface): Promise<ResponseInterface<User>> {
+  async enableTfa(
+    @GetUser() user: SessionInterface,
+  ): Promise<ResponseInterface<User>> {
     const data = await this.tfaAuthentificationService.enableTfa(user.id);
     return {
       message: 'Two factor authentication enabled',
@@ -38,21 +51,16 @@ export class UserController {
     };
   }
   @Post('/disable-tfa')
-  async disableTfa(@GetUser() user: SessionInterface): Promise<ResponseInterface<User>> {
+  async disableTfa(
+    @GetUser() user: SessionInterface,
+  ): Promise<ResponseInterface<User>> {
     const data = await this.tfaAuthentificationService.disableTfa(user.id);
     return {
       message: 'Two factor authentication disabled',
       status: HttpStatus.OK,
     };
   }
-  @Post('/initiate-tfa-enabling')
-  async initiateTfaEnabling(@GetUser() user: SessionInterface): Promise<ResponseInterface<User>> {
-    const data = await this.tfaAuthentificationService.initiateTfaEnabling(user);
-    return {
-      message: 'Two factor authentication enabling initiated',
-      status: HttpStatus.OK,
-    };
-  }
+
   @Patch()
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);

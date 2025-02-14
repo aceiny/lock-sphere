@@ -8,56 +8,56 @@ import { In, Repository } from 'typeorm';
 export class CategoryService {
   constructor(
     @InjectRepository(Category)
-    private categoryRepository: Repository<Category>
-  ){}
-  async checkCategoryExistanceByName(name : string) : Promise<boolean> {
+    private categoryRepository: Repository<Category>,
+  ) {}
+  async checkCategoryExistanceByName(name: string): Promise<boolean> {
     const category = await this.categoryRepository.findOne({
-      where : {
-        name
-      }
+      where: {
+        name,
+      },
     });
-    return !!category
+    return !!category;
   }
-  async create(userId : string , createCategoryDto: CreateCategoryDto) {
-    if(await this.checkCategoryExistanceByName(createCategoryDto.name)){
+  async create(userId: string, createCategoryDto: CreateCategoryDto) {
+    if (await this.checkCategoryExistanceByName(createCategoryDto.name)) {
       throw new NotFoundException('Category already exists');
     }
     const category = this.categoryRepository.create({
       ...createCategoryDto,
-      user : {id : userId}
-    })
+      user: { id: userId },
+    });
     return this.categoryRepository.save(category);
   }
 
-  async findBulkCategories(userId : string , ids : string[]) {
+  async findBulkCategories(userId: string, ids: string[]) {
     return this.categoryRepository.find({
       where: { id: In(ids), user: { id: userId } },
-  });
+    });
   }
-  async findAllUserCategories(userId : string) {
+  async findAllUserCategories(userId: string) {
     return this.categoryRepository.find({
-      where : {
-        user : {id : userId}
-      }
-    })
+      where: {
+        user: { id: userId },
+      },
+    });
   }
 
-  async findOneCategory(userId : string , id: string) {
+  async findOneCategory(userId: string, id: string) {
     const category = await this.categoryRepository.findOneBy({
       id,
-      user : {id : userId}
+      user: { id: userId },
     });
-    if(!category){
+    if (!category) {
       throw new NotFoundException('Category not found');
     }
-    return category
+    return category;
   }
 
   async remove(id: string) {
     const category = await this.categoryRepository.delete(id);
-    if(category.affected === 0){
+    if (category.affected === 0) {
       throw new NotFoundException('Category not found');
     }
-    return true
+    return true;
   }
 }

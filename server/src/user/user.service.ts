@@ -46,14 +46,23 @@ export class UserService {
     const user = this.userRepository.create(createUserDto);
     return this.userRepository.save(user);
   }
-  async changeTfaState(id: string , state : boolean) {
+  async changeTfaState(id: string, state: boolean): Promise<boolean> {
     const user = await this.findOneById(id);
+    if (user.is_tfa_enabled === state) {
+      switch (state) {
+        case true:
+          throw new ConflictException(
+            'Two factor authentication already enabled',
+          );
+        case false:
+          throw new ConflictException(
+            'Two factor authentication already disabled',
+          );
+      }
+    }
     user.is_tfa_enabled = state;
-    return this.userRepository.save(user);
-  }
-  async changeTfaSecret(user: User , secret : string) {
-    user.tfa_secret = secret;
-    return this.userRepository.save(user);
+    await this.userRepository.save(user);
+    return true;
   }
 
   async findOneById(id: string) {
@@ -74,7 +83,7 @@ export class UserService {
 
   async remove(id: string) {
     const user = await this.findOneById(id);
-    // disable all sessions of user need to be done 
+    // disable all sessions of user need to be done
     return this.userRepository.remove(user);
   }
 }

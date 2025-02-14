@@ -16,13 +16,9 @@ import { CategoryModule } from 'src/category/category.module';
     UserModule,
     QueueModule,
     AuthLogModule,
-    CategoryModule
+    CategoryModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    Session,
-  ],
+  providers: [AuthService, LocalStrategy, Session],
 })
 export class AuthModule {}

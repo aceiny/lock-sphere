@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
@@ -15,10 +20,13 @@ import * as geoip from 'geoip-lite';
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly authLogService : AuthLogService,
+    private readonly authLogService: AuthLogService,
     @InjectQueue('email-queue') private emailQueue: Queue,
   ) {}
-  async validateUser(email: string, password: string): Promise<SessionInterface> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<SessionInterface> {
     console.log(email, password);
     email = email.trim().toLowerCase();
     const user = await this.userService.findByEmailWithPassword(email);
@@ -32,49 +40,49 @@ export class AuthService {
     if (!passwordMatch) {
       throw new BadRequestException('Invalid credentials');
     }
-    /* validate mfa and other security logique */ 
+    /* validate mfa and other security logique */
     return {
       id: user.id,
       email: user.email,
-      name : user.name
+      name: user.name,
     };
   }
-  async signin(req : Request , user : SessionInterface): Promise<any> {
+  async signin(req: Request, user: SessionInterface): Promise<any> {
     const mailDto: SendEmailOptions = {
       to: user.email,
       subject: 'New login to your lock sphere account',
     };
     const location = geoip.lookup(req.ip);
-    Logger.log(location);  
-    await this.authLogService.createAuthLog(user.id , {
-      ip_address : req.ip,
-      user_agent : req.headers["user-agent"] || "Unknown",
-      status : AuthLogStatusEnum.SUCCESS
-    })
+    Logger.log(location);
+    await this.authLogService.createAuthLog(user.id, {
+      ip_address: req.ip,
+      user_agent: req.headers['user-agent'] || 'Unknown',
+      status: AuthLogStatusEnum.SUCCESS,
+    });
     /*await this.emailQueue.add(
       "new-login",
       { mailDto },
       { attempts: 3, backoff: { type: "exponential", delay: 1000 } },
       );*/
-      return true;
+    return true;
+  }
+  async signup(createUserDto: CreateUserDto): Promise<any> {
+    return this.userService.create(createUserDto);
+  }
+  async signout(request: Request): Promise<boolean> {
+    if (!request.session?.passport) {
+      throw new UnauthorizedException('Session not found');
     }
-    async signup(createUserDto: CreateUserDto): Promise<any> {
-      return this.userService.create(createUserDto);
-    }
-    async signout(request: Request): Promise<boolean> {
-      if (!request.session?.passport) {
-        throw new UnauthorizedException('Session not found');
+
+    request.session.destroy((err) => {
+      if (err) {
+        throw new Error();
       }
-      
-      request.session.destroy((err) => {
-        if (err) {
-          throw new Error();
-        }
-      });
-      request.res.clearCookie(getEnvOrFatal('COOKIE_NAME'));
-      return true;
-    }
-    async passworMatch(password: string, hash: string): Promise<boolean> {
-      return await bcrypt.compare(password, hash);
-    }
+    });
+    request.res.clearCookie(getEnvOrFatal('COOKIE_NAME'));
+    return true;
+  }
+  async passworMatch(password: string, hash: string): Promise<boolean> {
+    return await bcrypt.compare(password, hash);
+  }
 }

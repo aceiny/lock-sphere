@@ -5,31 +5,31 @@ import { AuthLogStatusEnum } from '../type/auth-log.status.enum';
 
 @Entity()
 export class AuthLog {
-    @PrimaryColumn('uuid')
-    id: string = uuidv4();
+  @PrimaryColumn('uuid')
+  id: string = uuidv4();
 
-    @ManyToOne(() => User , {onDelete : "CASCADE" , nullable : false})
-    user: User;
-    
-    @Column()
-    ip_address: string;
+  @ManyToOne(() => User, { onDelete: 'CASCADE', nullable: false })
+  user: User;
 
-    @Column()
-    user_agent: string;
+  @Column()
+  ip_address: string;
 
-    @Column({
-      type: 'enum',
-      enum: AuthLogStatusEnum,
-      default: AuthLogStatusEnum.SUCCESS,
-    })
-    status: AuthLogStatusEnum;
+  @Column()
+  user_agent: string;
 
-    @Column({ type: 'text', nullable: true })
-    reason?: string;
+  @Column({
+    type: 'enum',
+    enum: AuthLogStatusEnum,
+    default: AuthLogStatusEnum.SUCCESS,
+  })
+  status: AuthLogStatusEnum;
 
-    @Column({ default : "Unknown" })
-    location?: string;
+  @Column({ type: 'text', nullable: true })
+  reason?: string;
 
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    loggedAt: Date;
+  @Column({ default: 'Unknown' })
+  location?: string;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  loggedAt: Date;
 }

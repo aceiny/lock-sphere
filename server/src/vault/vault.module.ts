@@ -7,11 +7,11 @@ import { SessionMiddleware } from 'common/middlewares/session.middleware';
 import { CategoryModule } from 'src/category/category.module';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Vault]) , CategoryModule],
+  imports: [TypeOrmModule.forFeature([Vault]), CategoryModule],
   controllers: [VaultController],
   providers: [VaultService],
 })
-export class VaultModule  implements NestModule {
+export class VaultModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SessionMiddleware).forRoutes(VaultController);
   }

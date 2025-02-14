@@ -49,6 +49,14 @@ const ENV_VAR_TYPES: Record<string, EnvVarConfig> = {
   COOKIE_HTTPONLY: { type: 'boolean' },
   COOKIE_EXPIRATION: { type: 'number' },
 
+  // tfa configuration
+  TFA_ISSUER: { type: 'string' },
+  TFA_SECRET_TTL: { type: 'number' },
+
+  CHALLENGE_CREATION_LIMIT: { type: 'number' },
+  CHALLENGE_CREATION_WINDOW: { type: 'number' },
+  CHALLENGE_VERIFY_LIMIT: { type: 'number' },
+  CHALLENGE_VERIFY_WINDOW: { type: 'number' },
   // Redis Configuration
   REDIS_PORT: { type: 'port' }
 };

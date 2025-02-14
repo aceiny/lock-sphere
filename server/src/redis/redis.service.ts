@@ -14,10 +14,16 @@ export class RedisService {
     return JSON.parse(await this.redisClient.get(key));
   }
 
-  async SetKey(key: string, value: any): Promise<any> {
-    return await this.redisClient.set(key, JSON.stringify(value));
+  async SetKey(key: string, value: string, ttl?: number) {
+    if (ttl) {
+      await this.redisClient.set(key, value, 'EX', ttl);
+    } else {
+      await this.redisClient.set(key, value);
+    }
   }
-
+  async IncrementKey(key: string): Promise<number> {
+    return await this.redisClient.incr(key);
+  }
   async KeyExists(key: string): Promise<boolean> {
     const result = await this.redisClient.exists(key);
     return !!result;

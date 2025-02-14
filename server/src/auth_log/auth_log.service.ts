@@ -11,27 +11,33 @@ export class AuthLogService {
     @InjectRepository(AuthLog)
     private readonly authLogRepository: Repository<AuthLog>,
   ) {}
-  async getPaginatedAuthLogs(userId : string , page : number , offset : number): Promise<PaginatedResponse<AuthLog>> {
-    const [aut_logs , total] = await this.authLogRepository.findAndCount({
-        where : {user : {id : userId}},
-        order : {loggedAt : "DESC"},
-        skip : (page - 1) * offset,
-        take : offset,
-
+  async getPaginatedAuthLogs(
+    userId: string,
+    page: number,
+    offset: number,
+  ): Promise<PaginatedResponse<AuthLog>> {
+    const [aut_logs, total] = await this.authLogRepository.findAndCount({
+      where: { user: { id: userId } },
+      order: { loggedAt: 'DESC' },
+      skip: (page - 1) * offset,
+      take: offset,
     });
     return {
-        data : aut_logs,
-        total,
-        page,
-        offset,
-        totalPages: Math.ceil(total / offset),
-      }
+      data: aut_logs,
+      total,
+      page,
+      offset,
+      totalPages: Math.ceil(total / offset),
+    };
   }
-  async createAuthLog(userId : string , authLog : CreateAuthLogInterface ): Promise<AuthLog> {
+  async createAuthLog(
+    userId: string,
+    authLog: CreateAuthLogInterface,
+  ): Promise<AuthLog> {
     const auth_log = this.authLogRepository.create({
-        ...authLog,
-        user : {id : userId}
+      ...authLog,
+      user: { id: userId },
     });
-    return  this.authLogRepository.save(auth_log);
+    return this.authLogRepository.save(auth_log);
   }
 }

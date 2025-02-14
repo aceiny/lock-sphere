@@ -30,8 +30,11 @@ export class AuthController {
   }
   @UseGuards(LocalGuard)
   @Post('signin')
-  async signin(@Req() req : Request , @GetUser() user : SessionInterface): Promise<ResponseInterface<null>> {
-    const data = await this.authService.signin(req , user);
+  async signin(
+    @Req() req: Request,
+    @GetUser() user: SessionInterface,
+  ): Promise<ResponseInterface<null>> {
+    const data = await this.authService.signin(req, user);
     return {
       message: 'Signin succesfully',
       status: HttpStatus.CREATED,

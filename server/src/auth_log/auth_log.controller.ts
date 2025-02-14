@@ -1,4 +1,11 @@
-import { Controller, DefaultValuePipe, Get, HttpStatus, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  DefaultValuePipe,
+  Get,
+  HttpStatus,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
 import { AuthLogService } from './auth_log.service';
 import { ResponseInterface } from 'shared/interfaces/response.interface';
 import { PaginatedResponse } from 'shared/interfaces/paginated.response.interface';
@@ -10,20 +17,23 @@ import { default_offset, default_page } from 'shared/constants/pagination';
 @Controller('auth-log')
 export class AuthLogController {
   constructor(private readonly authLogService: AuthLogService) {}
-  @Get(
-  )
+  @Get()
   async getAuthLogs(
-    @GetUser() user : SessionInterface,
-    @Query("page", new DefaultValuePipe(default_page), ParseIntPipe)
+    @GetUser() user: SessionInterface,
+    @Query('page', new DefaultValuePipe(default_page), ParseIntPipe)
     page: number,
-    @Query("offset", new DefaultValuePipe(default_offset), ParseIntPipe)
+    @Query('offset', new DefaultValuePipe(default_offset), ParseIntPipe)
     offset: number,
-  ) : Promise<ResponseInterface<PaginatedResponse<AuthLog>>> {
-    const data =  await this.authLogService.getPaginatedAuthLogs(user.id , page , offset);
+  ): Promise<ResponseInterface<PaginatedResponse<AuthLog>>> {
+    const data = await this.authLogService.getPaginatedAuthLogs(
+      user.id,
+      page,
+      offset,
+    );
     return {
-      message : "Auth Logs fetched successfully",
-      status : HttpStatus.OK,
-      data
-    }
+      message: 'Auth Logs fetched successfully',
+      status: HttpStatus.OK,
+      data,
+    };
   }
 }

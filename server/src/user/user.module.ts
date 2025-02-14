@@ -5,11 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { SessionMiddleware } from 'common/middlewares/session.middleware';
 import { TfaAuthentificationService } from './tfa-authentification.service';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]), RedisModule],
   controllers: [UserController],
-  providers: [UserService , TfaAuthentificationService],
+  providers: [UserService, TfaAuthentificationService],
   exports: [UserService],
 })
 export class UserModule implements NestModule {
