@@ -23,7 +23,6 @@ import ThemeToggler from "@/components/theme-toggler"
 import { layoutData } from "@/constants/layout"
 import { Settings, LogOut, User, Bell } from 'lucide-react'
 import { motion } from "framer-motion"
-import { signOut } from "@/utils/auth"
 
 export function Navbar() {
   const router = useRouter()
@@ -34,7 +33,6 @@ export function Navbar() {
   }
 
   const handleLogout = () => {
-    signOut()
     setShowLogoutDialog(false)
   }
 

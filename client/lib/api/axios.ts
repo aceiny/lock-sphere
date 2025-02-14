@@ -1,20 +1,17 @@
 import axios from "axios"
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: "http://localhost:3000",
   headers: {
     "Content-Type": "application/json",
   },
-})
+  validateStatus: (status: number) => status === 200 || status === 201,
+  withCredentials:true
+}) 
 
 // Add a request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Get token from localStorage or your auth state management
-    const token = localStorage.getItem("token")
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
     return config
   },
   (error) => {
@@ -28,8 +25,6 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access - redirect to login
-      localStorage.removeItem("token")
-      window.location.href = "/login"
     }
     return Promise.reject(error)
   },

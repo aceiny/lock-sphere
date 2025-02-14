@@ -4,12 +4,13 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Eye, EyeOff, KeyRound, Mail } from "lucide-react"
+import { Eye, EyeOff, KeyRound, Mail, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useSignin, useSignup } from "@/lib/api/auth"
 
 interface AuthFormProps {
   mode: "login" | "register"
@@ -19,15 +20,30 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [showPassword, setShowPassword] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const router = useRouter()
-
+  const { mutate: mutateSignin, isPending: isSigningIn } = useSignin()
+  const { mutate: mutateSignup, isPending: isSigningUp } = useSignup()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    const formData = new FormData(e.currentTarget as HTMLFormElement)
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
+    const name = formData.get('name') as string
+    switch (mode) {
+      case "login":
+        mutateSignin({email, password})
+        break
+      case "register":
+        mutateSignup({email, password , name})
+        break
+
+    }
+    setLoading(false)
     // TODO: Implement authentication logic
-    setTimeout(() => {
+    /*setTimeout(() => {
       setLoading(false)
       router.push("/dashboard")
-    }, 2000)
+    }, 2000)*/
   }
 
   const handleGoogleSignIn = () => {
@@ -52,18 +68,27 @@ export function AuthForm({ mode }: AuthFormProps) {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+          {mode === "register" && (
+            <div className="space-y-2">
+              <Label htmlFor="email">Name</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                <Input id="name" name="name" type="name" placeholder="jhon doe" className="pl-10" required />
+              </div>
+            </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                <Input id="email" type="email" placeholder="name@example.com" className="pl-10" required />
+                <Input id="email" name="email" type="email" placeholder="name@example.com" className="pl-10" required />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <KeyRound className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                <Input id="password" type={showPassword ? "text" : "password"} className="pl-10 pr-10" required />
+                <Input id="password" name="password" type={showPassword ? "text" : "password"} className="pl-10 pr-10" required />
                 <Button
                   type="button"
                   variant="ghost"
@@ -80,20 +105,6 @@ export function AuthForm({ mode }: AuthFormProps) {
                 </Button>
               </div>
             </div>
-            {mode === "register" && (
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <div className="relative">
-                  <KeyRound className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="confirm-password"
-                    type={showPassword ? "text" : "password"}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                </div>
-              </div>
-            )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>

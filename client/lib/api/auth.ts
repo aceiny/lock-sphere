@@ -1,6 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import type { AuthResponse, AuthLog } from "../types/api"
 import axios from "./axios"
+import { AxiosError } from "axios"
+import { showErrorToast, showSuccessToast } from "@/components/utils/toast-handler"
 
 interface SignupCredentials {
   email: string
@@ -25,16 +27,31 @@ export function useSignup() {
       const { data } = await axios.post<AuthResponse>("/auth/signup", credentials)
       return data
     },
+    onSuccess: (data) => {
+      showSuccessToast("Signup succesfull please login")
+      window.location.replace('/login')
+    },
+    onError: (error : any) => {
+      showErrorToast(error.response?.data?.message)
+    }
   })
 }
 
 // Signin
+
 export function useSignin() {
   return useMutation({
     mutationFn: async (credentials: SigninCredentials) => {
       const { data } = await axios.post<AuthResponse>("/auth/signin", credentials)
+      console.log(data)
       return data
     },
+    onSuccess: (data) => {
+      window.location.replace('/dashboard')
+    },
+    onError: (error : any) => {
+      showErrorToast(error.response?.data?.message)
+    }
   })
 }
 

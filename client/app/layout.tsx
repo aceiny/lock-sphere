@@ -5,7 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import type React from "react"
 import { ReactQueryProvider } from "@/lib/ReactQueryProvider"
 import { PublicPathChecker } from "@/lib/PublicPathChecker"
-
+import { Toaster } from "react-hot-toast"
 export const metadata: Metadata = {
   title: "LockSphere - Password Manager",
   description: "A secure, zero-knowledge password manager",
@@ -22,7 +22,10 @@ export default function RootLayout({
       <body>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <ReactQueryProvider>
-        <PublicPathChecker>{children}</PublicPathChecker>
+        <PublicPathChecker>
+          <Toaster/>
+          {children}
+        </PublicPathChecker>
         <ReactQueryDevtools initialIsOpen={false} />
           </ReactQueryProvider>
         </ThemeProvider>
