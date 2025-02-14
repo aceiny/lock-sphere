@@ -1,54 +1,29 @@
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule, OpenAPIObject } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
 
-export const SetupSwagger = (app: INestApplication) => {
+export const SetupSwagger = (app: INestApplication): void => {
   const config = new DocumentBuilder()
-    .setTitle('Lock Sphere')
-    .setDescription(`
-      API Documentation for lock sphere app:
-    `)
+    .setTitle('Lock Sphere API')
+    .setDescription('API Documentation for Lock Sphere')
     .setVersion('1.0')
-    // JWT Auth configuration
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth'
-    )
-    // Session Auth configuration
     .addCookieAuth(
-      'session_id',
+      'sessionId',
       {
         type: 'apiKey',
         in: 'cookie',
-        name: 'session_id',
         description: 'Session cookie authentication',
       },
       'session-auth'
     )
-    // API sections
-    .addTag('Auth', 'Authentication endpoints (JWT and Session)')
-    .addTag('Users', 'User management endpoints')
-    .addTag('Public', 'Public endpoints - no auth required')
     .addServer('http://localhost:3000', 'Local environment')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  
-  // Add security requirements globally
-  document.security = [
-    {
-      'JWT-auth': [],
-      'session-auth': [],
-    },
-  ];
+  const document: OpenAPIObject = SwaggerModule.createDocument(app, config);
 
-  const customOptions = {
+  // Apply security globally
+  document.security = [{'session-auth': [] }];
+
+  SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
       filter: true,
@@ -58,8 +33,6 @@ export const SetupSwagger = (app: INestApplication) => {
       defaultModelExpandDepth: 3,
       tagsSorter: 'alpha',
     },
-    customSiteTitle: 'Lock Sphere Api docs',
-  };
-
-  SwaggerModule.setup('api/docs', app, document, customOptions);
+    customSiteTitle: 'Lock Sphere API Docs',
+  });
 };

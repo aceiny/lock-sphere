@@ -13,10 +13,22 @@ import { AuthLog } from './entities/auth_log.entity';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
 import { SessionInterface } from 'shared/interfaces/session.interface';
 import { default_offset, default_page } from 'shared/constants/pagination';
+import { ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth log')
 @Controller('auth-log')
 export class AuthLogController {
   constructor(private readonly authLogService: AuthLogService) {}
+
+  @ApiOperation({
+    summary: 'Get paginated auth logs',
+    description: 'Get paginated auth logs for the user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Auth logs fetched successfully',
+  })
+  @ApiCookieAuth('session-auth')
   @Get()
   async getAuthLogs(
     @GetUser() user: SessionInterface,

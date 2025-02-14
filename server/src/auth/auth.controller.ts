@@ -13,13 +13,17 @@ import { ResponseInterface } from 'shared/interfaces/response.interface';
 import { Request } from 'express';
 import { SessionInterface } from 'shared/interfaces/session.interface';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
-import { Verify } from 'crypto';
 import { VerifyTfaDto } from 'src/user/dto/verify-tfa.dto';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({
+    summary : 'Signup a new user',
+  })
   @Post('signup')
   async signup(
     @Body() createUserDto: CreateUserDto,
@@ -30,6 +34,17 @@ export class AuthController {
       status: HttpStatus.CREATED,
     };
   }
+  @ApiOperation({
+    summary : 'Signin a user',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Signin succesfully',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'invalid credentials or requires two factor authentication', 
+  })
   @UseGuards(LocalGuard)
   @Post('signin')
   async signin(
@@ -39,9 +54,13 @@ export class AuthController {
     const data = await this.authService.signin(req, user);
     return {
       message: 'Signin succesfully',
-      status: HttpStatus.CREATED,
+      status: HttpStatus.OK,
     };
   }
+
+  @ApiOperation({
+    summary : 'Signout a user',
+  })
   @Post('/signout')
   async signout(@Req() req: Request): Promise<ResponseInterface<null>> {
     const data = await this.authService.signout(req);
@@ -50,6 +69,10 @@ export class AuthController {
       status: HttpStatus.OK,
     };
   }
+
+  @ApiOperation({
+    summary : 'Verify two factor authentication',
+  })
   @Post('/verify-tfa')
   async verifyTfa(
     @Req() req: Request,

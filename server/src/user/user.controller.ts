@@ -9,14 +9,15 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
 import { ResponseInterface } from 'shared/interfaces/response.interface';
 import { SessionInterface } from 'shared/interfaces/session.interface';
 import { User } from './entities/user.entity';
 import { TfaAuthentificationService } from './tfa-authentification.service';
+import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(
@@ -24,11 +25,8 @@ export class UserController {
     private readonly userService: UserService,
   ) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
+  @ApiOperation({ summary: 'get user profile data' })
+  @ApiCookieAuth('session-auth')
   @Get()
   async findUser(
     @GetUser() user: SessionInterface,
@@ -40,6 +38,9 @@ export class UserController {
       data,
     };
   }
+
+  @ApiOperation({ summary: 'enable tfa for user' })
+  @ApiCookieAuth('session-auth')
   @Post('/enable-tfa')
   async enableTfa(
     @GetUser() user: SessionInterface,
@@ -50,6 +51,9 @@ export class UserController {
       status: HttpStatus.OK,
     };
   }
+
+  @ApiOperation({ summary: 'disable tfa for user' })
+  @ApiCookieAuth('session-auth')
   @Post('/disable-tfa')
   async disableTfa(
     @GetUser() user: SessionInterface,
@@ -61,11 +65,15 @@ export class UserController {
     };
   }
 
+  @ApiOperation({ summary: 'update user info' })
+  @ApiCookieAuth('session-auth')
   @Patch()
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
+  @ApiOperation({ summary: 'delete user profile from the app' })
+  @ApiCookieAuth('session-auth')
   @Delete()
   remove(@Param('id') id: string) {
     return this.userService.remove(id);

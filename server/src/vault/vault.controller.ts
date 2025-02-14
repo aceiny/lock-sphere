@@ -18,7 +18,7 @@ import { UpdateVaultDto } from './dto/update-vault.dto';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
 import { SessionInterface } from 'shared/interfaces/session.interface';
 import { default_offset, default_page } from 'shared/constants/pagination';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginatedResponse } from 'shared/interfaces/paginated.response.interface';
 import { ResponseInterface } from 'shared/interfaces/response.interface';
 import { Vault } from './entities/vault.entity';
@@ -32,6 +32,18 @@ import {
 export class VaultController {
   constructor(private readonly vaultService: VaultService) {}
 
+  @ApiOperation({
+    summary: 'Create a new vault',
+    description: 'Create a new vault for the user',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Vault created successfully'
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'One or more categories not found'
+  })
   @Post()
   async create(
     @GetUser() user: SessionInterface,
@@ -44,6 +56,25 @@ export class VaultController {
     };
   }
 
+  @ApiOperation({
+    summary: 'Add category to vault',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Category added to vault successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Category not found',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Vault not found',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Category already exists in vault',
+  })
   @Post('/category/:vaultId')
   async addCategoryToVault(
     @GetUser() user: SessionInterface,
@@ -60,6 +91,26 @@ export class VaultController {
       status: HttpStatus.CREATED,
     };
   }
+
+  @ApiOperation({
+    summary: 'Remove category from vault',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Category removed from vault successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Category not found in vault',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Vault not found',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Category does not exist in vault',
+  })
   @Delete('/category/:vaultId')
   async removeCategoryFromVault(
     @GetUser() user: SessionInterface,
@@ -78,7 +129,7 @@ export class VaultController {
   }
 
   @ApiOperation({
-    summary: 'Get all vaults',
+    summary: 'Get all vaults paginated',
     description: 'Get all vaults for user paginated',
   })
   @ApiQuery({
@@ -113,6 +164,18 @@ export class VaultController {
     };
   }
 
+  @ApiOperation({
+    summary: 'Get a single vault',
+    description: 'Get a single vault by id',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Vault fetched successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Vault not found',
+  })
   @Get(':id')
   async findOneVault(
     @GetUser() user: SessionInterface,
@@ -126,6 +189,18 @@ export class VaultController {
     };
   }
 
+  @ApiOperation({
+    summary: 'Update a vault',
+    description: 'Update a vault by id',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Vault updated successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Vault not found',
+  })
   @Patch(':id')
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -134,6 +209,18 @@ export class VaultController {
     return this.vaultService.update(id, updateVaultDto);
   }
 
+  @ApiOperation({
+    summary: 'Delete a vault',
+    description: 'Delete a vault by id',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Vault deleted successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Vault not found',
+  })
   @Delete(':id')
   async remove(
     @GetUser() user: SessionInterface,
