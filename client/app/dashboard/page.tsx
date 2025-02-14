@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Plus, Search, Tags } from "lucide-react";
-import { PasswordCard } from "@/components/password/password-card";
-import { PasswordDialog } from "@/components/password/password-dialogs";
-import { CategoryDialog } from "@/components/password/category-dialog";
+import * as React from "react"
+import { motion } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Plus, Search, Tags } from "lucide-react"
+import { PasswordCard } from "@/components/password/password-card"
+import { PasswordDialog } from "@/components/password/password-dialogs"
+import { CategoryDialog } from "@/components/password/category-dialog"
 
 const container = {
   hidden: { opacity: 0 },
@@ -17,11 +17,11 @@ const container = {
       staggerChildren: 0.1,
     },
   },
-};
+}
 
 export default function DashboardPage() {
-  const [showAddDialog, setShowAddDialog] = React.useState(false);
-  const [showCategoryDialog, setShowCategoryDialog] = React.useState(false);
+  const [showAddDialog, setShowAddDialog] = React.useState(false)
+  const [showCategoryDialog, setShowCategoryDialog] = React.useState(false)
 
   return (
     <div className="space-y-6">
@@ -32,34 +32,20 @@ export default function DashboardPage() {
       >
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Passwords</h1>
-          <p className="text-muted-foreground">
-            Manage and organize your secure passwords
-          </p>
+          <p className="text-muted-foreground">Manage and organize your secure passwords</p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setShowCategoryDialog(true)}
-          >
+          <Button variant="outline" size="icon" onClick={() => setShowCategoryDialog(true)}>
             <Tags className="h-5 w-5" />
             <span className="sr-only">Manage categories</span>
           </Button>
-          <Button
-            size="lg"
-            className="group"
-            onClick={() => setShowAddDialog(true)}
-          >
+          <Button size="lg" className="group" onClick={() => setShowAddDialog(true)}>
             <Plus className="mr-2 h-5 w-5 transition-transform group-hover:rotate-90" />
             Add Password
           </Button>
         </div>
       </motion.div>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="relative"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Search passwords..." className="pl-9" />
       </motion.div>
@@ -98,16 +84,10 @@ export default function DashboardPage() {
         />
       </motion.div>
 
-      <PasswordDialog
-        open={showAddDialog}
-        onOpenChange={setShowAddDialog}
-        mode="add"
-      />
+      <PasswordDialog open={showAddDialog} onOpenChange={setShowAddDialog} mode="add" />
 
-      <CategoryDialog
-        open={showCategoryDialog}
-        onOpenChange={setShowCategoryDialog}
-      />
+      <CategoryDialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog} />
     </div>
-  );
+  )
 }
+

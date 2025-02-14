@@ -1,0 +1,126 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import type { Vault } from "../types/api"
+import axios from "./axios"
+
+interface CreateVaultData {
+  title: string
+  username: string
+  password: string
+  url?: string
+  notes?: string
+  categoryId?: string
+}
+
+// Create vault
+export function useCreateVault() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (data: CreateVaultData) => {
+      const response = await axios.post<Vault>("/vault", data)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vaults"] })
+    },
+  })
+}
+
+// Get all vaults
+export function useVaults() {
+  return useQuery({
+    queryKey: ["vaults"],
+    queryFn: async () => {
+      const { data } = await axios.get<Vault[]>("/vault")
+      return data
+    },
+  })
+}
+
+// Get vault by id
+export function useVault(id: string) {
+  return useQuery({
+    queryKey: ["vaults", id],
+    queryFn: async () => {
+      const { data } = await axios.get<Vault>(`/vault/${id}`)
+      return data
+    },
+  })
+}
+
+// Update vault
+export function useUpdateVault() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...data }: CreateVaultData & { id: string }) => {
+      const response = await axios.patch<Vault>(`/vault/${id}`, data)
+      return response.data
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["vaults"] })
+      queryClient.invalidateQueries({ queryKey: ["vaults", variables.id] })
+    },
+  })
+}
+
+// Delete vault
+export function useDeleteVault() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await axios.delete(`/vault/${id}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vaults"] })
+    },
+  })
+}
+
+// Add category to vault
+export function useAddCategoryToVault() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ vaultId, categoryId }: { vaultId: string; categoryId: string }) => {
+      const response = await axios.post(`/vault/category/${vaultId}`, { categoryId })
+      return response.data
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["vaults"] })
+      queryClient.invalidateQueries({ queryKey: ["vaults", variables.vaultId] })
+    },
+  })
+}
+
+// Remove category from vault
+export function useRemoveCategoryFromVault() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ vaultId, categoryId }: { vaultId: string; categoryId: string }) => {
+      await axios.delete(`/vault/category/${vaultId}`, { data: { categoryId } })
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["vaults"] })
+      queryClient.invalidateQueries({ queryKey: ["vaults", variables.vaultId] })
+    },
+  })
+}
+
+// Add this export function:
+export function useExportVault() {
+  return useMutation({
+    mutationFn: async () => {
+      const response = await axios.get("/vault/export", {
+        responseType: "blob",
+      })
+      // Create blob link to download
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement("a")
+      link.href = url
+      link.setAttribute("download", `vault-export-${new Date().toISOString()}.json`)
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode?.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    },
+  })
+}
+

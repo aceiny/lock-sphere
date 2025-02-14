@@ -1,34 +1,36 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { cn } from "@/lib/utils";
-import { PublicPathChecker } from "@/components/utils/PublicPathChecker";
-import { ThemeProvider } from "@/components/utils/theme-provider";
-
-const inter = Inter({ subsets: ["latin"] });
+import type { Metadata } from "next"
+import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import type React from "react"
+import { ReactQueryProvider } from "@/lib/ReactQueryProvider"
+import { PublicPathChecker } from "@/lib/PublicPathChecker"
 
 export const metadata: Metadata = {
-  title: "Lock Sphere - Password Manager",
+  title: "LockSphere - Password Manager",
   description: "A secure, zero-knowledge password manager",
-};
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(inter.className, "antialiased")}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <PublicPathChecker>{children}</PublicPathChecker>
+      <head></head>
+      <body>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ReactQueryProvider>
+        <PublicPathChecker>{children}</PublicPathChecker>
+        <ReactQueryDevtools initialIsOpen={false} />
+          </ReactQueryProvider>
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
+
+
+
+

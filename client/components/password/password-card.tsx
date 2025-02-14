@@ -172,7 +172,7 @@ export function PasswordCard({
           url,
         }}
       />
-
+  
     <DeleteConfirmationDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
