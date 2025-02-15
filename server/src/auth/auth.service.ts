@@ -44,13 +44,15 @@ export class AuthService {
     if (!passwordMatch) {
       throw new BadRequestException('Invalid credentials');
     }
+    console.log('hi')
     if (user.tfa_state == TfaState.ENABLED) {
-      await this.tfaAuthentificationService.generateMfaTokenChallenge(user.id);
+      await this.tfaAuthentificationService.generateTfaTokenChallenge(user.id);
       throw new UnauthorizedException({
         message: 'Two factor authentication required',
         tfa_required: true,
       });
     }
+    console.log('hidsd')
     return {
       id: user.id,
       email: user.email,
