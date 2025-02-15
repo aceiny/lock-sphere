@@ -4,6 +4,7 @@ import { ChronoEntity } from 'abtract/entity.abstract';
 import { Exclude } from 'class-transformer';
 import { TfaState } from '../types/tfa-state.enum';
 import { randomBytes } from 'crypto';
+import { getEnvOrFatal } from 'common/utils/env.util';
 
 @Entity()
 export class User extends ChronoEntity {
@@ -23,7 +24,7 @@ export class User extends ChronoEntity {
   @Column({ type: 'boolean', default: false })
   is_email_verified: boolean;
   
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true , default : getEnvOrFatal('DEFAULT_PROFILE_PICTURE')})
   
   profile_picture : string;
   @BeforeInsert()
