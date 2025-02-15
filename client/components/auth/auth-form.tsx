@@ -39,20 +39,12 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     }
     setLoading(false)
-    // TODO: Implement authentication logic
-    /*setTimeout(() => {
-      setLoading(false)
-      router.push("/dashboard")
-    }, 2000)*/
   }
 
   const handleGoogleSignIn = () => {
+    
     setLoading(true)
-    // TODO: Implement Google sign-in
-    setTimeout(() => {
-      setLoading(false)
-      router.push("/dashboard")
-    }, 2000)
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`
   }
 
   return (

@@ -9,6 +9,7 @@ import { Session } from './serializer/session.serializer';
 import { QueueModule } from 'src/queue/queue.module';
 import { AuthLogModule } from 'src/auth_log/auth_log.module';
 import { CategoryModule } from 'src/category/category.module';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { CategoryModule } from 'src/category/category.module';
     CategoryModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, Session],
+  providers: [AuthService, LocalStrategy, GoogleStrategy , Session],
 })
 export class AuthModule {}

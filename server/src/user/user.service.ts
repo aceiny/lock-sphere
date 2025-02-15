@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto } from './types/create-user.dto';
+import { createGooelUserDto, CreateUserDto } from './types/create-user.dto';
 import { UpdateUserDto } from './types/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -28,6 +28,13 @@ export class UserService {
     }
     return false;
   }
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: {
+        email,
+      },
+    });
+  }
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return this.userRepository
       .createQueryBuilder('user')
@@ -45,6 +52,10 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     await this.checkUsedEmail(createUserDto.email);
     const user = this.userRepository.create(createUserDto);
+    return this.userRepository.save(user);
+  }
+  async createWithGoogle(createGooelUserDto: createGooelUserDto) {
+    const user = this.userRepository.create(createGooelUserDto);
     return this.userRepository.save(user);
   }
   async changeTfaState(id: string, state: TfaState): Promise<boolean> {

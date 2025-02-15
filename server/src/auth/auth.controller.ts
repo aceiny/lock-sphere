@@ -1,25 +1,53 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
   Req,
+  Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalGuard } from 'common/guards/auth/local.guard';
 import { CreateUserDto } from 'src/user/types/create-user.dto';
 import { ResponseInterface } from 'shared/interfaces/response.interface';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { SessionInterface } from 'shared/interfaces/session.interface';
 import { GetUser } from 'common/decorators/auth/get-user.decorator';
 import { VerifyTfaDto } from 'src/user/types/verify-tfa.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GoogleAuthGuard } from 'common/guards/auth/google-auth.guard';
+import { getEnvOrFatal } from 'common/utils/env.util';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
+  private readonly FRONTEND_URL = getEnvOrFatal('FRONTEND_URL')
   constructor(private readonly authService: AuthService) {}
+
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuth() {
+    // This will redirect the user to Google's login page
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuthRedirect(@GetUser() user : SessionInterface , @Req() req: Request , @Res({passthrough : true}) res: Response) {
+    if (!user) {
+      throw new UnauthorizedException('Google authentication failed');
+    }
+    await new Promise<void>((resolve, reject) => {
+      req.login(user, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+
+    res.redirect(`${this.FRONTEND_URL}/dashboard`);
+  }
 
   @ApiOperation({
     summary: 'Signup a new user',
@@ -78,10 +106,14 @@ export class AuthController {
     @Body() verifyTfaDto: VerifyTfaDto,
     @Req() req : Request,
   ): Promise<ResponseInterface<null>> {
-    const data = await this.authService.verifyTfa(req , verifyTfaDto);
-    return {
-      message: 'Two factor authentication verified',
-      status: HttpStatus.OK,
-    };
+    const data = await this.authService.verifyTfa(verifyTfaDto);
+    return new Promise((resolve, reject) => {
+      req.login(data, (err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve({ message: 'TFA verified, session signed', status: HttpStatus.OK });
+      });
+    });
   }
 }

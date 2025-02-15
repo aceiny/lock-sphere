@@ -59,16 +59,26 @@ export class AuthService {
         name: user.name,
       };
     }
-  async verifyTfa(req : Request , verifyTfaDto: VerifyTfaDto): Promise<any> {
+    async validateUserWithGoogle(user: any): Promise<SessionInterface> {
+      const existingUser = await this.userService.findByEmail(user.email);
+      if (existingUser) {
+        return {
+          id: existingUser.id,
+          email: existingUser.email,
+          name: existingUser.name,
+        };
+      }
+      const new_user = await this.userService.createWithGoogle(user)
+      return {
+        id: new_user.id,
+        email: new_user.email,
+        name: new_user.name,
+      };
+    }
+  
+  async verifyTfa(verifyTfaDto: VerifyTfaDto): Promise<boolean> {
     const user = await this.tfaAuthentificationService.verifyTfaToken(verifyTfaDto)
-    return new Promise((resolve, reject) => {
-      req.login(user, (err) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve({ message: 'TFA verified, session signed', user });
-      });
-    });
+    return true
   }
   async signin(req: Request, user: SessionInterface): Promise<any> {
     const mailDto: SendEmailOptions = {
