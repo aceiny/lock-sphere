@@ -2,36 +2,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
+import { useAuthLogs } from "@/lib/api/auth";
 
-const loginHistory = [
-    {
-      date: "2024-02-11 14:30",
-      device: "Chrome on Windows",
-      location: "New York, USA",
-      status : "success",
-      ip: "192.168.1.1",
-    },
-    {
-      date: "2024-02-10 09:15",
-      device: "Safari on iPhone",
-      status : "success",
-      location: "London, UK",
-      ip: "192.168.1.2",
-    },
-    {
-      date: "2024-02-09 18:45",
-      device: "Firefox on MacOS",
-      location: "Paris, France",
-      status: "failed",
-      ip: "192.168.1.3",
-    },
-  ]
-  
 export default function SettingsActivity(){
+  const {data} = useAuthLogs()
+  const loginHistory = data?.data?.data ? data?.data?.data  : []
+  console.log(loginHistory)
     return (
         <motion.div
                 key="activity"
                 initial={{ opacity: 0, x: -20 }}
+
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.2 }}
@@ -57,21 +38,21 @@ export default function SettingsActivity(){
                     <TableBody>
                       {loginHistory.map((log, index) => (
                         <TableRow key={index}>
-                          <TableCell>{log.date}</TableCell>
-                          <TableCell>{log.device}</TableCell>
+                          <TableCell>{log.loggedAt}</TableCell>
+                          <TableCell>{log.user_agent}</TableCell>
                           <TableCell>{log.location}</TableCell>
                           <TableCell>
                             <Badge
                               variant={
-                                log.status === "success"
+                                log.status === "SUCCESS"
                                   ? "success"
                                   : "destructive"
                               }
                             >
-                              {log.status}
+                              {log.status.toLowerCase()}
                             </Badge>
                           </TableCell>
-                          <TableCell className="font-mono">{log.ip}</TableCell>
+                          <TableCell className="font-mono">{log.ip_address}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

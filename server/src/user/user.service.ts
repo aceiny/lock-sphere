@@ -91,7 +91,14 @@ export class UserService {
     }
     return user;
   }
-
+  async updateAvatar(id : string , avatar : Express.Multer.File){
+    if(!avatar){
+      throw new ConflictException('Avatar is required')
+    }
+    const user = await this.findOneById(id);
+    user.profile_picture = avatar.path
+    return this.userRepository.save(user);
+  }
   update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import type { AuthResponse, AuthLog } from "../types/api"
-import axios from "./axios"
+import axios, { ResponseInterface } from "./axios"
 import { AxiosError } from "axios"
 import { showErrorToast, showSuccessToast } from "@/components/utils/toast-handler"
 
@@ -97,7 +97,7 @@ export function useAuthLogs(page = 1, limit = 10) {
   return useQuery({
     queryKey: ["auth-logs", page, limit],
     queryFn: async () => {
-      const { data } = await axios.get<PaginatedResponse<AuthLog>>("/auth-log", {
+      const { data } = await axios.get<ResponseInterface<PaginatedResponse<any>>>("/auth-log", {
         params: { page, limit },
       })
       return data

@@ -1,5 +1,10 @@
 import axios from "axios"
 
+export interface ResponseInterface<T> {
+  message : string,
+  stats : number,
+  data : T
+}
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {

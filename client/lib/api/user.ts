@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { User } from "../types/api"
 import axios from "./axios"
+import { showErrorToast } from "@/components/utils/toast-handler"
+import { AxiosProgressEvent } from "axios"
 
 interface UpdateUserData {
   name?: string
@@ -68,4 +70,33 @@ export function useDisableTFA() {
     },
   })
 }
+interface UploadOptions {
+  onUploadProgress?: (progressEvent: AxiosProgressEvent) => void;
+}
 
+export function useUpdateProfilePicture() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User, Error, { formData: FormData; options?: UploadOptions }>({
+    mutationFn: async ({ formData, options }) => {
+      const { data: responseData } = await axios.patch<User>(
+        '/user/update-avatar',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: options?.onUploadProgress,
+        }
+      );
+      return responseData;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+    onError: (error: any) => {
+      console.error('Mutation error:', error);
+      showErrorToast(error.response?.data?.message)
+    },
+  });
+}

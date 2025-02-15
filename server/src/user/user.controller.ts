@@ -7,6 +7,9 @@ import {
   Param,
   Delete,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
+  Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './types/update-user.dto';
@@ -17,6 +20,8 @@ import { User } from './entities/user.entity';
 import { TfaAuthentificationService } from './tfa-authentification.service';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { VerifyTfaSetupDto } from './types/verify-tfa.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { MulterConfig } from 'config/multer-config';
 
 @ApiTags('User')
 @Controller('user')
@@ -86,6 +91,20 @@ export class UserController {
     };
   }
 
+  @ApiOperation({summary : 'update user avatar'})
+  @ApiCookieAuth('session-auth')
+  @Patch('/update-avatar')
+  @UseInterceptors(FileInterceptor('avatar' , MulterConfig))
+  async updateAvatar(
+    @GetUser() user: SessionInterface,
+    @UploadedFile() avatar : Express.Multer.File
+  ): Promise<any> /*ResponseInterface<User>> */{
+      const data = await this.userService.updateAvatar(user.id , avatar);
+    return {
+      message: 'Avatar updated',
+      status: HttpStatus.OK,
+    };
+  }
   @ApiOperation({ summary: 'update user info' })
   @ApiCookieAuth('session-auth')
   @Patch()

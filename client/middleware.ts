@@ -7,17 +7,13 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
   const { pathname } = req.nextUrl;
   const sessionId = req.cookies.get("sessionId")?.value;
 
-  console.log("Middleware triggered. Path:", pathname);
-  console.log("Session ID:", sessionId || "No session ID found");
 
   // Allow public paths without authentication
   if (publicPaths.includes(pathname)) {
-    console.log("Public route. Skipping authentication.");
     return NextResponse.next();
   }
 
   if (!sessionId) {
-    console.log("No session found. Redirecting to login.");
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
@@ -27,14 +23,12 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
     });
 
     if (sessionCheck.status === 200) {
-      console.log("Session valid.");
       return NextResponse.next();
     }
   } catch (error: any) {
     console.error("Session validation failed:", error?.response?.status, error?.message);
 
     if (error?.response?.status === 401) {
-      console.log("Invalid session. Redirecting to login.");
       return NextResponse.redirect(new URL("/login", req.url));
     }
   }
