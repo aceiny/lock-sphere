@@ -1,7 +1,4 @@
-"use client";
-import * as React from "react"
-import { AnimatePresence, motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card";
+"use client";;
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,21 +9,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Shield, Database, User, SettingsIcon, Activity } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation"
-import { useSignout } from "@/lib/api/auth"
-import { cn } from "@/lib/utils"
-import SettingsActivity from "@/components/settings/SettingsActivity"
-import SettingsPreferences from "@/components/settings/SettingsPreferences"
-import SettingsSecurity from "@/components/settings/SettingsSecurity"
-import SettingsData from "@/components/settings/SettingsData"
+import { useSignout } from "@/lib/api/auth";
 
 interface LogoutDialogProps {
   showLogoutDialog : boolean,
   setShowLogoutDialog : (show : boolean) => void
-  handleLogout : () => void
-} 
-const LogoutDialog = ({showLogoutDialog, setShowLogoutDialog, handleLogout} : LogoutDialogProps) => {
+}
+const LogoutDialog = ({showLogoutDialog, setShowLogoutDialog} : LogoutDialogProps) => {
+    const {mutate : mutateSignout} = useSignout()
+    const handleLogout = () => {
+      mutateSignout()
+    }
   return (
           <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
             <AlertDialogContent>

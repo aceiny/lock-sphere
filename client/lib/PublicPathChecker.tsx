@@ -3,11 +3,11 @@
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layouts/sidebar";
 import { Navbar } from "@/components/layouts/navbar";
+import { publicPaths } from "@/constants/publicPath";
 
 export function PublicPathChecker({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   // List of paths that should not show the sidebar
-  const publicPaths = ["/", "/login", "/register", "/verify-email", "/verify-mfa"]
   const isPublicPath = publicPaths.includes(pathname);
 
   return (

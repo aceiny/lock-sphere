@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { CreateUserDto } from 'src/user/types/create-user.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -102,17 +102,17 @@ export class AuthService {
   async signup(createUserDto: CreateUserDto): Promise<any> {
     return this.userService.create(createUserDto);
   }
-  async signout(request: Request): Promise<boolean> {
-    if (!request.session?.passport) {
+  async signout(req: Request , res : Response): Promise<boolean> {
+    if (!req.session?.passport) {
       throw new UnauthorizedException('Session not found');
     }
 
-    request.session.destroy((err) => {
+    req.session.destroy((err) => {
       if (err) {
         throw new Error();
       }
     });
-    request.res.clearCookie(getEnvOrFatal('COOKIE_NAME'));
+    res.clearCookie(getEnvOrFatal('COOKIE_NAME'));
     return true;
   }
   async passworMatch(password: string, hash: string): Promise<boolean> {

@@ -1,17 +1,6 @@
-"use client"
-
+"use client";;
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,8 +10,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import ThemeToggler from "@/components/theme-toggler"
 import { layoutData } from "@/constants/layout"
-import { Settings, LogOut, User, Bell } from 'lucide-react'
+import { Settings, LogOut, User } from 'lucide-react';
 import { motion } from "framer-motion"
+import LogoutDialog from "../settings/LogoutDialog"
+import { useUser } from "@/lib/api/user";
 
 export function Navbar() {
   const router = useRouter()
@@ -31,11 +22,8 @@ export function Navbar() {
   const handleSettingsNavigation = (section: string) => {
     router.push(`/settings?section=${section}`)
   }
-
-  const handleLogout = () => {
-    setShowLogoutDialog(false)
-  }
-
+  const { data: user } = useUser()
+  console.log(user)
   return (
     <div className="h-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-full items-center gap-4 px-4 sm:gap-8">
@@ -94,25 +82,7 @@ export function Navbar() {
         </div>
       </div>
 
-      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will end your current session. You'll need to log in again to access your vault.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleLogout}
-              className="bg-red-600 text-white hover:bg-red-700 dark:hover:bg-red-700"
-            >
-              Log out
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <LogoutDialog showLogoutDialog={showLogoutDialog} setShowLogoutDialog={setShowLogoutDialog} />
     </div>
   )
 }

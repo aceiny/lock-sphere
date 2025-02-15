@@ -20,6 +20,18 @@ interface VerifyTFACredentials {
   token: string
 }
 
+export function useCheckSession() {
+  return useMutation({
+    mutationFn: async () => {
+      await axios.get("/auth/session")
+    },
+    onError: (error: AxiosError) => {
+      if (error.response?.status === 401) {
+        window.location.replace("/login")
+      }
+    },
+  })
+}
 // Signup
 export function useSignup() {
   return useMutation({
@@ -61,6 +73,12 @@ export function useSignout() {
     mutationFn: async () => {
       await axios.post("/auth/signout")
     },
+    onSuccess: () => {
+      window.location.replace('/')
+    },
+    onError: (error : any) => {
+      showErrorToast(error.response?.data?.message)
+    }
   })
 }
 

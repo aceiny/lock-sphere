@@ -35,7 +35,7 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  async googleAuthRedirect(@GetUser() user : SessionInterface , @Req() req: Request , @Res({passthrough : true}) res: Response) {
+  async googleAuthRedirect(@GetUser() user : SessionInterface , @Req() req: Request , @Res({passthrough : true}) res: Response) : Promise<void> {
     if (!user) {
       throw new UnauthorizedException('Google authentication failed');
     }
@@ -46,7 +46,7 @@ export class AuthController {
       });
     });
 
-    res.redirect(`${this.FRONTEND_URL}/dashboard`);
+    return res.redirect(`${this.FRONTEND_URL}/auth/loading`);
   }
 
   @ApiOperation({
@@ -90,8 +90,8 @@ export class AuthController {
     summary: 'Signout a user',
   })
   @Post('/signout')
-  async signout(@Req() req: Request): Promise<ResponseInterface<null>> {
-    const data = await this.authService.signout(req);
+  async signout(@Req() req: Request , @Res({passthrough : true}) res : Response): Promise<ResponseInterface<null>> {
+    const data = await this.authService.signout(req , res);
     return {
       message: 'Logout succesfully',
       status: HttpStatus.OK,
@@ -115,5 +115,16 @@ export class AuthController {
         resolve({ message: 'TFA verified, session signed', status: HttpStatus.OK });
       });
     });
+  }
+
+  @ApiOperation({
+    summary: 'validate the session',
+  })
+  @Get('validate-session')
+  async validateSession(@GetUser() user: SessionInterface): Promise<ResponseInterface<null>> {
+    return {
+      message: 'Session valid',
+      status: HttpStatus.OK,
+    };
   }
 }

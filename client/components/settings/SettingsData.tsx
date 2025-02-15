@@ -17,7 +17,6 @@ const SettingsData = () => {
           console.log("Export vault - to be implemented")
         },
       }
-      const logout = useSignout()
       const [showExportDialog, setShowExportDialog] = React.useState(false)
       const handleExport = async () => {
         try {
@@ -25,14 +24,6 @@ const SettingsData = () => {
           setShowExportDialog(false)
         } catch (error) {
           console.error("Export failed:", error)
-        }
-      }
-    
-      const handleLogout = async () => {
-        try {
-          await logout.mutateAsync()
-        } catch (error) {
-          console.error("Logout failed:", error)
         }
       }
   return (
@@ -80,7 +71,7 @@ const SettingsData = () => {
     </Card>
   </motion.div>
   <ExportDataDialog showExportDialog={showExportDialog} setShowExportDialog={setShowExportDialog} handleExport={handleExport}/>
-  <LogoutDialog showLogoutDialog={showLogoutDialog} setShowLogoutDialog={setShowLogoutDialog} handleLogout={handleLogout}/>
+  <LogoutDialog showLogoutDialog={showLogoutDialog} setShowLogoutDialog={setShowLogoutDialog}/>
     </>
   )
 }
