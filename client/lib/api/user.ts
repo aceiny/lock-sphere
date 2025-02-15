@@ -6,15 +6,15 @@ interface UpdateUserData {
   name?: string
   email?: string
 }
-
+async function fetchUser (){
+  const { data } = await axios.get("/user")
+  return data.data
+}
 // Get user profile
 export function useUser() {
   return useQuery({
     queryKey: ["user"],
-    queryFn: async () => {
-      const { data } = await axios.get<User>("/user")
-      return data
-    },
+    queryFn: fetchUser
   })
 }
 

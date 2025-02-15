@@ -32,6 +32,7 @@ export class UserController {
   async findUser(
     @GetUser() user: SessionInterface,
   ): Promise<ResponseInterface<User>> {
+    console.log(user)
     const data = await this.userService.findOneById(user.id);
     return {
       message: 'User found',

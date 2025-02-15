@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { createGooelUserDto, CreateUserDto } from './types/create-user.dto';
+import {  createGoogleUserDto, CreateUserDto } from './types/create-user.dto';
 import { UpdateUserDto } from './types/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -54,8 +54,8 @@ export class UserService {
     const user = this.userRepository.create(createUserDto);
     return this.userRepository.save(user);
   }
-  async createWithGoogle(createGooelUserDto: createGooelUserDto) {
-    const user = this.userRepository.create(createGooelUserDto);
+  async createWithGoogle(createGoogleUserDto: createGoogleUserDto) {
+    const user = this.userRepository.create(createGoogleUserDto);
     return this.userRepository.save(user);
   }
   async changeTfaState(id: string, state: TfaState): Promise<boolean> {
@@ -78,6 +78,9 @@ export class UserService {
   }
 
   async findOneById(id: string) {
+    if(!id){
+      throw new UnauthorizedException('User not found');
+    }
     const user = this.userRepository.findOne({
       where: {
         id,

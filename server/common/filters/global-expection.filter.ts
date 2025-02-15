@@ -72,11 +72,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   private logError(exception: unknown, request: any): void {
     if (exception instanceof HttpException) {
       // Log HTTP exceptions with their status and message
-      /*
       this.logger.error(
         `HTTP Exception: ${exception.getStatus()} - ${exception.message}`,
         exception.stack,
-      );*/
+      );
     } else if (exception instanceof QueryFailedError) {
       // Log database errors with the query and parameters
       this.logger.error(

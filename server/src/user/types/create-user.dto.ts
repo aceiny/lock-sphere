@@ -12,7 +12,7 @@ export class CreateUserDto {
   @IsStrongPassword()
   password: string;
 }
-export class createGooelUserDto{
+export class createGoogleUserDto{
   @IsEmail()
   email: string;
 
@@ -22,5 +22,5 @@ export class createGooelUserDto{
   name: string;
 
   @IsUrl()
-  picture: string;
+  profile_picture: string;
 }

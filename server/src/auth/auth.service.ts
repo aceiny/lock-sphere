@@ -9,7 +9,7 @@ import {
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { CreateUserDto } from 'src/user/types/create-user.dto';
+import { createGoogleUserDto, CreateUserDto } from 'src/user/types/create-user.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { SendEmailOptions } from 'src/mail/interfaces/send-email.interface';
@@ -21,6 +21,7 @@ import * as geoip from 'geoip-lite';
 import { TfaAuthentificationService } from 'src/user/tfa-authentification.service';
 import { VerifyTfaDto } from 'src/user/types/verify-tfa.dto';
 import { TfaState } from 'src/user/types/tfa-state.enum';
+import { GoogleUser } from './types/google-user.interface';
 @Injectable()
 export class AuthService {
   constructor(
@@ -59,7 +60,7 @@ export class AuthService {
         name: user.name,
       };
     }
-    async validateUserWithGoogle(user: any): Promise<SessionInterface> {
+    async validateUserWithGoogle(user: createGoogleUserDto): Promise<SessionInterface> {
       const existingUser = await this.userService.findByEmail(user.email);
       if (existingUser) {
         return {

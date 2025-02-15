@@ -39,6 +39,7 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException('Google authentication failed');
     }
+    console.log(res)
     await new Promise<void>((resolve, reject) => {
       req.login(user, (err) => {
         if (err) return reject(err);
@@ -122,8 +123,11 @@ export class AuthController {
   })
   @Get('validate-session')
   async validateSession(@GetUser() user: SessionInterface): Promise<ResponseInterface<null>> {
+    if(!user || !user.id) {
+      throw new UnauthorizedException('Invalid session');
+    }
     return {
-      message: 'Session valid',
+      message: 'Session is valid',
       status: HttpStatus.OK,
     };
   }

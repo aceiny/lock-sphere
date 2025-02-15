@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, RequestMethod } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
@@ -10,6 +10,8 @@ import { QueueModule } from 'src/queue/queue.module';
 import { AuthLogModule } from 'src/auth_log/auth_log.module';
 import { CategoryModule } from 'src/category/category.module';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { SessionMiddleware } from 'common/middlewares/session.middleware';
 
 @Module({
   imports: [
@@ -22,4 +24,8 @@ import { GoogleStrategy } from './strategies/google.strategy';
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, GoogleStrategy , Session],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SessionMiddleware).forRoutes({path : 'auth/validate-session' , method : RequestMethod.GET });
+  }
+}
