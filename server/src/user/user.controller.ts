@@ -16,8 +16,7 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
 import { User } from './entities/user.entity';
 import { TfaAuthentificationService } from './tfa-authentification.service';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { VerifyTfaDto } from './types/verify-tfa.dto';
-import { verify } from 'crypto';
+import { VerifyTfaSetupDto } from './types/verify-tfa.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -61,7 +60,7 @@ export class UserController {
   @Post('/enable-tfa')
   async enableTfa(
     @GetUser() user: SessionInterface,
-    @Body() VerifyTfaDto: VerifyTfaDto,
+    @Body() VerifyTfaDto: VerifyTfaSetupDto,
   ): Promise<ResponseInterface<User>> {
     const data = await this.tfaAuthentificationService.enableTfa(
       user.id,

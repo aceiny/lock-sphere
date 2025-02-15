@@ -75,10 +75,10 @@ export class AuthController {
   })
   @Post('/verify-tfa')
   async verifyTfa(
-    @Req() req: Request,
     @Body() verifyTfaDto: VerifyTfaDto,
+    @Req() req : Request,
   ): Promise<ResponseInterface<null>> {
-    const data = await this.authService.verifyTfa(req, verifyTfaDto);
+    const data = await this.authService.verifyTfa(req , verifyTfaDto);
     return {
       message: 'Two factor authentication verified',
       status: HttpStatus.OK,

@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   Logger,
   UnauthorizedException,
@@ -27,39 +29,47 @@ export class AuthService {
     private readonly authLogService: AuthLogService,
     @InjectQueue('email-queue') private emailQueue: Queue,
   ) {}
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<SessionInterface> {
-    console.log(email, password);
-    email = email.trim().toLowerCase();
-    const user = await this.userService.findByEmailWithPassword(email);
-    if (!user) {
-      throw new BadRequestException('Invalid credentials');
+    async validateUser(
+      email: string,
+      password: string,
+    ): Promise<SessionInterface> {
+      console.log(email, password);
+      email = email.trim().toLowerCase();
+      const user = await this.userService.findByEmailWithPassword(email);
+      if (!user) {
+        throw new BadRequestException('Invalid credentials');
+      }
+      const passwordMatch: boolean = await this.passworMatch(
+        password,
+        user.password,
+      );
+      if (!passwordMatch) {
+        throw new BadRequestException('Invalid credentials');
+      }
+      if (user.tfa_state == TfaState.ENABLED) {
+        const encryped_challange = await this.tfaAuthentificationService.generateTfaTokenChallenge(user.id);
+        throw new UnauthorizedException({
+          message: "Tfa required",
+          challange: encryped_challange,
+        });
+      }
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      };
     }
-    const passwordMatch: boolean = await this.passworMatch(
-      password,
-      user.password,
-    );
-    if (!passwordMatch) {
-      throw new BadRequestException('Invalid credentials');
-    }
-    console.log('hi')
-    if (user.tfa_state == TfaState.ENABLED) {
-      await this.tfaAuthentificationService.generateTfaTokenChallenge(user.id);
-      throw new UnauthorizedException({
-        message: 'Two factor authentication required',
-        tfa_required: true,
+  async verifyTfa(req : Request , verifyTfaDto: VerifyTfaDto): Promise<any> {
+    const user = await this.tfaAuthentificationService.verifyTfaToken(verifyTfaDto)
+    return new Promise((resolve, reject) => {
+      req.login(user, (err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve({ message: 'TFA verified, session signed', user });
       });
-    }
-    console.log('hidsd')
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    };
+    });
   }
-  async verifyTfa(req: Request, verifyTfaDto: VerifyTfaDto): Promise<any> {}
   async signin(req: Request, user: SessionInterface): Promise<any> {
     const mailDto: SendEmailOptions = {
       to: user.email,

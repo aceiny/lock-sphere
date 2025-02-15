@@ -10,15 +10,32 @@ export class RedisService {
   async DeleteKey(key: string): Promise<any> {
     return await this.redisClient.del(key);
   }
-  async GetKey(key: string): Promise<any> {
-    return JSON.parse(await this.redisClient.get(key));
+  async GetKey(key: string , parse : boolean = false): Promise<any> {
+    switch (parse) {
+      case true:
+        return JSON.parse(await this.redisClient.get(key));
+      case false:
+        return await this.redisClient.get(key);
+    }
   }
 
-  async SetKey(key: string, value: string, ttl?: number) {
+  async SetKey(key: string, value: string, ttl?: number , stringify : boolean = false) {
     if (ttl) {
-      await this.redisClient.set(key, JSON.stringify(value), 'EX', ttl);
+      switch (stringify) {
+        case true:
+          await this.redisClient.set(key, JSON.stringify(value), 'EX', ttl);
+          break;
+        case false:
+          await this.redisClient.set(key, value, 'EX', ttl);
+      }
     } else {
-      await this.redisClient.set(key, JSON.stringify(value));
+      switch (stringify) {
+        case true:
+          await this.redisClient.set(key, JSON.stringify(value));
+          break;
+        case false:
+          await this.redisClient.set(key, value);
+      }
     }
   }
   async IncrementKey(key: string): Promise<number> {

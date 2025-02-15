@@ -16,6 +16,7 @@
   import { VerifyTfaDto } from './types/verify-tfa.dto';
   import { TfaState } from './types/tfa-state.enum';
   import { randomBytes , createCipheriv, createDecipheriv } from 'crypto';
+import { SessionInterface } from 'shared/interfaces/session.interface';
   @Injectable()
   export class TfaAuthentificationService {
     private readonly TFA_ENCRYPTION_KEY = TFA_ENCRYPTION_KEY
@@ -55,7 +56,9 @@
       const encryptedSecret = await this.redisService.GetKey(
         this.getTfaRedisSecretKey(userId),
       );
+      console.log("encrypted" , encryptedSecret)
       const user_tfa_secret = this.decrypt(encryptedSecret)
+      console.log(user_tfa_secret)
       /// check that the token is valid
       const is_valid = authenticator.verify({
         token,
@@ -90,7 +93,7 @@
 
       // nothing is wrong , generate a new secret for the user and return the qr code
       const { qr_code, secret, otp_uri } = await this.generateSecret(userId);
-      await this.redisService.SetKey(this.getTfaRedisSecretKey(userId), secret);
+      await this.redisService.SetKey(this.getTfaRedisSecretKey(userId), this.encrypt(secret));
       await this.userService.changeTfaState(userId, TfaState.PENDING);
       return { qr_code, otp_uri };
     }
@@ -117,14 +120,17 @@
       };
     }
 
-    async verifyTfaToken(encrypted_challange: string, verifyTokenDto: VerifyTfaDto) {
-
+    async verifyTfaToken(verifyTokenDto: VerifyTfaDto) : Promise<SessionInterface> {
       // decrypt the challange and get the user information 
-      const challenge_token = this.decrypt(encrypted_challange)
-      if (!challenge_token) {
+      let challenge_token : string;
+      try{
+        challenge_token = this.decrypt(verifyTokenDto.challange)
+      }
+      catch(err){
         throw new ConflictException('Invalid challange token');
       }
       const userId = await this.redisService.GetKey(this.getChallengeCreationKey(challenge_token));
+      console.log(userId, "chaleng" , challenge_token) 
       if(!userId){
         throw new ConflictException('Invalid challange token');
       }
@@ -158,8 +164,12 @@
       }
 
       // delete the attempts key as the user has successfully logged in
-      await this.redisService.DeleteKey(this.getChallengeVerificationKey(userId));
-      return true;
+      await this.redisService.DeleteKey(this.getChallengeCreationKey(challenge_token));
+      return {
+        id : user.id,
+        email : user.email,
+        name : user.name,
+      };
     }
 
     async generateTfaTokenChallenge(userId: string) {
@@ -240,7 +250,7 @@
         const iv = randomBytes(12);
         
         // Create cipher
-        const cipher = createCipheriv ('aes-256-gcm', this.TFA_ENCRYPTION_KEY, iv);
+        const cipher = createCipheriv('aes-256-gcm', this.TFA_ENCRYPTION_KEY, iv);
         
         // Encrypt the text
         let encrypted = cipher.update(text, 'utf8', 'hex');
