@@ -8,10 +8,32 @@ import { Switch } from "@/components/ui/switch"
 import { Bell, Shield } from "lucide-react";
 import React from "react";
 import TfaDialog from "./TfaDialog";
+import { useDisableTFA, useInitiateTFA, useUser } from "@/lib/api/user";
+import { showErrorToast } from "../utils/toast-handler";
 
 const SettingsSecurity = () => {
+    const {data : user} = useUser()
+    const {mutate : mutateInitiateTfaEnabling} = useInitiateTFA()
+    const {mutate : mutateDisableTfa} = useDisableTFA()
     const [show2FADialog, setShow2FADialog] = React.useState(false)
-      const [twoFactorMethod, setTwoFactorMethod] = React.useState<"authenticator" | "email">("authenticator")
+    const [twoFactorMethod, setTwoFactorMethod] = React.useState<"authenticator" | "email">("authenticator")
+    const [tfaData, setTfaData] = React.useState<{ qr_code: string, otp_uri: string } | null>(null)
+    const handleInitiateTfa = async () => {
+      mutateInitiateTfaEnabling(undefined , {
+        onSuccess: (data) => {
+          console.log('data' , data)
+          setTfaData(data.data)
+          setShow2FADialog(true)
+        },
+        onError: (error : any) => {
+          showErrorToast(error.response.data.message)
+        }
+      })
+    };
+    const handleDisableTfa = async () => {
+      mutateDisableTfa()
+    }
+
   return (
     <>
      <motion.div
@@ -51,7 +73,7 @@ const SettingsSecurity = () => {
               </div>
               <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
             </div>
-            <Switch onCheckedChange={(checked) => checked && setShow2FADialog(true)} />
+            <Switch checked={user && user.tfa_state == "enabled"} onCheckedChange={(checked) => checked ? handleInitiateTfa() : handleDisableTfa()} />
           </div>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
@@ -67,8 +89,7 @@ const SettingsSecurity = () => {
       </CardContent>
     </Card>
   </motion.div> 
-    <TfaDialog show2FADialog={show2FADialog} setShow2FADialog={setShow2FADialog} twoFactorMethod={twoFactorMethod} setTwoFactorMethod={setTwoFactorMethod} /> 
-  
+  <TfaDialog  qrCode={tfaData?.qr_code} otpUri={tfaData?.otp_uri} show2FADialog={show2FADialog} setShow2FADialog={setShow2FADialog} twoFactorMethod={twoFactorMethod} setTwoFactorMethod={setTwoFactorMethod} /> 
     </>
   )
 }

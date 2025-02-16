@@ -28,6 +28,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if(error.response?.data?.message == "Tfa required"){
+      sessionStorage.setItem("tfa-challange", error.response?.data?.challange)
+      window.location.replace('/verify-mfa')
+    }
     return Promise.reject(error)
   },
 )

@@ -11,10 +11,12 @@ import { Shield, ArrowRight } from "lucide-react"
 import ThemeToggler from "@/components/theme-toggler"
 import { authData } from "@/constants/auth"
 import { useRouter } from "next/navigation"
+import { useVerifyTFA } from "@/lib/api/auth"
 
 export default function VerifyMFAPage() {
   const [code, setCode] = React.useState(["", "", "", "", "", ""])
   const [loading, setLoading] = React.useState(false)
+  const {mutate : mutateVerifyTfa} = useVerifyTFA()
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([])
   const router = useRouter()
 
@@ -58,12 +60,14 @@ export default function VerifyMFAPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false)
-      router.push("/dashboard")
-    }, 1500)
+    const token = code.join('')
+    const challange =  sessionStorage.getItem('tfa-challange') as string
+    console.log(token)
+    mutateVerifyTfa({
+      token,
+      challange
+    })
+    setLoading(false)
   }
 
   return (

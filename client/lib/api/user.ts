@@ -3,12 +3,13 @@ import type { User } from "../types/api"
 import axios from "./axios"
 import { showErrorToast } from "@/components/utils/toast-handler"
 import { AxiosProgressEvent } from "axios"
+import { DrawerTitle } from "@/components/ui/drawer"
 
 interface UpdateUserData {
   name?: string
   email?: string
 }
-async function fetchUser (){
+async function fetchUser () : Promise<User>{
   const { data } = await axios.get("/user")
   return data.data
 }
@@ -31,6 +32,9 @@ export function useUpdateUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] })
     },
+    onError: (error: any) => {
+      showErrorToast(error.response?.data?.message)
+    }
   })
 }
 
@@ -44,11 +48,20 @@ export function useDeleteUser() {
 }
 
 // Enable TFA
-export function useEnableTFA() {
+export function useInitiateTFA() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
-      const { data } = await axios.post<User>("/user/enable-tfa")
+      const { data } = await axios.post("/user/initiate-tfa")
+        return data
+    },
+  })
+}
+export function useEnableTFA() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (token : string) => {
+      const { data } = await axios.post("/user/enable-tfa", {token})
       return data
     },
     onSuccess: () => {
@@ -95,7 +108,6 @@ export function useUpdateProfilePicture() {
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
     onError: (error: any) => {
-      console.error('Mutation error:', error);
       showErrorToast(error.response?.data?.message)
     },
   });

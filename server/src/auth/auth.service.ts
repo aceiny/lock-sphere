@@ -1,11 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
@@ -21,7 +14,6 @@ import * as geoip from 'geoip-lite';
 import { TfaAuthentificationService } from 'src/user/tfa-authentification.service';
 import { VerifyTfaDto } from 'src/user/types/verify-tfa.dto';
 import { TfaState } from 'src/user/types/tfa-state.enum';
-import { GoogleUser } from './types/google-user.interface';
 @Injectable()
 export class AuthService {
   constructor(
@@ -77,9 +69,9 @@ export class AuthService {
       };
     }
   
-  async verifyTfa(verifyTfaDto: VerifyTfaDto): Promise<boolean> {
+  async verifyTfa(verifyTfaDto: VerifyTfaDto): Promise<SessionInterface> {
     const user = await this.tfaAuthentificationService.verifyTfaToken(verifyTfaDto)
-    return true
+    return user
   }
   async signin(req: Request, user: SessionInterface): Promise<any> {
     const mailDto: SendEmailOptions = {

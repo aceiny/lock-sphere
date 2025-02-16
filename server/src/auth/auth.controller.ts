@@ -108,6 +108,7 @@ export class AuthController {
     @Req() req : Request,
   ): Promise<ResponseInterface<null>> {
     const data = await this.authService.verifyTfa(verifyTfaDto);
+    console.log(data)
     return new Promise((resolve, reject) => {
       req.login(data, (err) => {
         if (err) {
@@ -123,6 +124,7 @@ export class AuthController {
   })
   @Get('validate-session')
   async validateSession(@GetUser() user: SessionInterface): Promise<ResponseInterface<null>> {
+    console.log(user)
     if(!user || !user.id) {
       throw new UnauthorizedException('Invalid session');
     }

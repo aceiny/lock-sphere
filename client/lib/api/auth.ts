@@ -16,7 +16,7 @@ interface SigninCredentials {
 }
 
 interface VerifyTFACredentials {
-  code: string
+  challange : string
   token: string
 }
 
@@ -62,7 +62,9 @@ export function useSignin() {
       window.location.replace('/dashboard')
     },
     onError: (error : any) => {
-      showErrorToast(error.response?.data?.message)
+      if(error.response?.data?.message != "Tfa required"){
+        showErrorToast(error.response?.data?.message)
+      }
     }
   })
 }
@@ -89,6 +91,12 @@ export function useVerifyTFA() {
       const { data } = await axios.post<AuthResponse>("/auth/verify-tfa", credentials)
       return data
     },
+    onSuccess(res){
+      window.location.replace('/dashboard')
+    },
+    onError(error : any){
+      showErrorToast(error.response?.data?.message)
+    }
   })
 }
 

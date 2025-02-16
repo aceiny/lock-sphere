@@ -7,7 +7,9 @@ export interface User {
   id: string
   email: string
   name: string
-  tfaEnabled: boolean
+  profile_picture: string
+  tfa_state: string
+  is_email_verified: boolean
   createdAt: string
   updatedAt: string
 }

@@ -90,7 +90,7 @@ function SettingsContent() {
         <div className="flex-1">
           <AnimatePresence mode="wait">
             {activeSection === "profile" && (
-              <SettingsProfile/>
+                <SettingsProfile/>   
             )}
 
             {activeSection === "security" && (
