@@ -16,7 +16,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-
+  // user service 
   async checkUsedEmail(email: string): Promise<boolean | void> {
     const user = await this.userRepository.findOne({
       where: {
