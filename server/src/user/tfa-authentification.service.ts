@@ -19,6 +19,8 @@
 import { SessionInterface } from 'shared/interfaces/session.interface';
   @Injectable()
   export class TfaAuthentificationService {
+
+    //switch to store secret in database
     private readonly TFA_ENCRYPTION_KEY = TFA_ENCRYPTION_KEY
     private readonly TFA_ISSUER = TFA_ISSUER;
     private readonly TFA_SECRET_TTL = TFA_SECRET_TTL;

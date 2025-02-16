@@ -1,5 +1,4 @@
-"use client"
-
+"use client";
 import * as React from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
@@ -10,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { Shield, ArrowRight } from "lucide-react"
 import ThemeToggler from "@/components/theme-toggler"
 import { authData } from "@/constants/auth"
-import { useRouter } from "next/navigation"
 import { useVerifyTFA } from "@/lib/api/auth"
 
 export default function VerifyMFAPage() {
@@ -18,8 +16,6 @@ export default function VerifyMFAPage() {
   const [loading, setLoading] = React.useState(false)
   const {mutate : mutateVerifyTfa} = useVerifyTFA()
   const inputRefs = React.useRef<(HTMLInputElement | null)[]>([])
-  const router = useRouter()
-
   const handleInput = (index: number, value: string) => {
     if (value.length > 1) {
       value = value[0]
@@ -62,7 +58,6 @@ export default function VerifyMFAPage() {
     setLoading(true)
     const token = code.join('')
     const challange =  sessionStorage.getItem('tfa-challange') as string
-    console.log(token)
     mutateVerifyTfa({
       token,
       challange
