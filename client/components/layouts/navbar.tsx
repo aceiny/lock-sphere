@@ -21,7 +21,7 @@ export function Navbar() {
   const [showLogoutDialog, setShowLogoutDialog] = React.useState(false);
 
   const { data: user } = useUser();
-  
+  // user data 
   return (
     <div className="h-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-full items-center gap-4 px-4 sm:gap-8">
