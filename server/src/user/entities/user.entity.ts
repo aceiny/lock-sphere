@@ -16,16 +16,19 @@ export class User extends ChronoEntity {
 
   @Column({ type: 'varchar', length: 255, select: false })
   password: string;
-
-  @Column({ type: 'enum', enum: TfaState, default: TfaState.DISABLED })
-  tfa_state: TfaState;
-
+  
   @Column({ type: 'boolean', default: false })
   is_email_verified: boolean;
   
   @Column({ type: 'varchar', length: 255, nullable: true , default : getEnvOrFatal('DEFAULT_PROFILE_PICTURE')})
-  
   profile_picture : string;
+  
+  @Column({ type: 'enum', enum: TfaState, default: TfaState.DISABLED })
+  tfa_state: TfaState;
+
+  @Column({ type: 'varchar', length: 255, select: false , nullable : true })
+  tfa_secret : string
+  
   @BeforeInsert()
   async hashPassword() {
     if(!this.password){

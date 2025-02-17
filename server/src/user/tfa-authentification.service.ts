@@ -33,11 +33,8 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
       private readonly userService: UserService,
       private readonly redisService: RedisService,
     ) {}
-    private getTfaRedisSecretKey(userId: string): string {
-      return `tfa:secret:${userId}`;
-    }
-    private getChallengeCreationKey(challengeToken: string): string {
-      return `tfa:challenge:${challengeToken}`;
+    private getChallengeCreationKey(challengeId: string): string {
+      return `tfa:challenge:${challengeId}`;
     }
     private getChallengeCreationCounterKey(userId: string): string {
       return `tfa:challenge:creation:counter:${userId}`;
@@ -49,17 +46,11 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
     //enables and disables 2fa for the user
     async enableTfa(userId: string, token: string) {
       // check to see if the user is pending tfa activation
-      const user = await this.userService.findOneById(userId);
+      const user = await this.userService.findOneByIdWithSecret(userId);
       if (user.tfa_state != TfaState.PENDING) {
         throw new ConflictException('2FA is not pending for this user');
       }
-      // verify the token
-      /// fetch the secret from redis and verify the token
-      const encryptedSecret = await this.redisService.GetKey(
-        this.getTfaRedisSecretKey(userId),
-      );
-      console.log("encrypted" , encryptedSecret)
-      const user_tfa_secret = this.decrypt(encryptedSecret)
+      const user_tfa_secret = this.decrypt(user.tfa_secret)
       console.log(user_tfa_secret)
       /// check that the token is valid
       const is_valid = authenticator.verify({
@@ -72,31 +63,28 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
       // token is valid means user has successfully passed the initiate tfa verification process
 
       // change the user 2FA state to enabled
-      await this.userService.changeTfaState(userId, TfaState.ENABLED);
+      await this.userService.changeTfaState(user, TfaState.ENABLED);
       // change the user 2FA enabled state to true
       return true;
     }
     async disableTfa(userId: string) {
+      const user = await this.userService.findOneByIdWithSecret(userId)
       // change the user 2FA state to false
-      await this.userService.changeTfaState(userId, TfaState.DISABLED);
-
+      await this.userService.changeTfaState(user , TfaState.DISABLED);
       // delete the 2FA secret and attempts key from redis if exists
-      await this.redisService.DeleteKey(this.getTfaRedisSecretKey(userId));
-      //await this.redisService.DeleteKey(this.getChallengeVerificationKey(userId));
-      //await this.redisService.DeleteKey(this.getChallengeCreationKey(userId));
-
+      await this.userService.changeTfaState(user , null)
       return true;
     }
     async initiateTfaEnabling(userId: string) {
-      const user = await this.userService.findOneById(userId);
+      const user = await this.userService.findOneByIdWithSecret(userId);
       if (user.tfa_state == TfaState.ENABLED) {
         throw new ConflictException('User already have tfa enabled');
       }
 
       // nothing is wrong , generate a new secret for the user and return the qr code
       const { qr_code, secret, otp_uri } = await this.generateSecret(userId);
-      await this.redisService.SetKey(this.getTfaRedisSecretKey(userId), this.encrypt(secret));
-      await this.userService.changeTfaState(userId, TfaState.PENDING);
+      await this.userService.changeUserTfaSecret(user, this.encrypt(secret));
+      await this.userService.changeTfaState(user, TfaState.PENDING);
       return { qr_code, otp_uri };
     }
     async generateSecret(userId: string) {
@@ -109,12 +97,6 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
       // generate qr code for the user to scan
       const qr_code = await QRCode.toDataURL(otp_uri, QrCOdeConfig);
 
-      // save the secret key in redis
-      await this.redisService.SetKey(
-        this.getTfaRedisSecretKey(userId),
-        this.encrypt(secret),
-        this.TFA_SECRET_TTL,
-      );
       return {
         qr_code,
         secret,
@@ -132,23 +114,19 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
         throw new ConflictException('Invalid challange token');
       }
       const userId = await this.redisService.GetKey(this.getChallengeCreationKey(challenge_token));
-      console.log(userId, "chaleng" , challenge_token) 
       if(!userId){
         throw new ConflictException('Invalid challange token');
       }
       // check if the user has exceeded the verification attempts
-      await this.checkChallengeVerifcationRateLimit(userId);
+      await this.checkChallengeVerifcationRateLimit(challenge_token);
       // check if 2FA is enabled for the user
-      const user = await this.userService.findOneById(userId);
+      const user = await this.userService.findOneByIdWithSecret(userId);
       if (user.tfa_state != TfaState.ENABLED) {
         throw new ConflictException('2FA is not enabled for this user');
       }
 
       // get user 2FA secret
-      const encryptedSecret = await this.redisService.GetKey(
-        this.getTfaRedisSecretKey(userId),
-      );
-      const user_tfa_secret = this.decrypt(encryptedSecret)
+      const user_tfa_secret = this.decrypt(user.tfa_secret)
       if (!user_tfa_secret) {
         throw new ConflictException('2FA secret not found , use other method and re-enable 2FA');
       }
@@ -161,7 +139,7 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
 
       if (!is_valid) {
         // increament challange attempts as this is a failed attempt
-        await this.incrementChallangeVerificationAttempts(userId);
+        await this.incrementChallangeVerificationAttempts(challenge_token);
         throw new ConflictException('Invalid 2FA code');
       }
 
@@ -210,9 +188,9 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
 
     // this method is for all challanges that are created
     private async checkChallengeVerifcationRateLimit(
-      userId: string,
+      challangeId: string,
     ): Promise<void> {
-      const key = this.getChallengeVerificationKey(userId);
+      const key = this.getChallengeVerificationKey(challangeId);
       const attempts = await this.redisService.GetKey(key);
 
       if (attempts && parseInt(attempts) >= this.CHALLENGE_VERIFY_LIMIT) {
@@ -236,9 +214,9 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
     }
 
     private async incrementChallangeVerificationAttempts(
-      userId: string,
+      challangeId: string,
     ): Promise<void> {
-      const key = this.getChallengeVerificationKey(userId);
+      const key = this.getChallengeVerificationKey(challangeId);
       const attempts = await this.redisService.GetKey(key);
 
       if (!attempts) {

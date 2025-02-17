@@ -35,6 +35,13 @@ export class UserService {
       },
     });
   }
+  async findOneByIdWithSecret(id : string){
+    return this.userRepository
+    .createQueryBuilder('user')
+    .where('user.id = :id' , {id})
+    .addSelect('user.password')
+    .getOne()
+  }
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return this.userRepository
       .createQueryBuilder('user')
@@ -58,8 +65,7 @@ export class UserService {
     const user = this.userRepository.create(createGoogleUserDto);
     return this.userRepository.save(user);
   }
-  async changeTfaState(id: string, state: TfaState): Promise<boolean> {
-    const user = await this.findOneById(id);
+  async changeTfaState(user : User, state: TfaState): Promise<boolean> {
     if (user.tfa_state === state) {
       switch (state) {
         case TfaState.ENABLED:
@@ -76,7 +82,6 @@ export class UserService {
     await this.userRepository.save(user);
     return true;
   }
-
   async findOneById(id: string) {
     if(!id){
       throw new UnauthorizedException('User not found');
@@ -102,7 +107,10 @@ export class UserService {
   update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
-
+  async changeUserTfaSecret(user : User , newSecret : string){
+    user.tfa_secret = newSecret
+    return this.userRepository.save(user)
+  }
   async remove(id: string) {
     const user = await this.findOneById(id);
     // disable all sessions of user need to be done
