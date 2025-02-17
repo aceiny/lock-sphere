@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
@@ -22,7 +22,7 @@ export class AuthService {
     private readonly authLogService: AuthLogService,
     @InjectQueue('email-queue') private emailQueue: Queue,
   ) {}
-    async validateUser(
+  async validateUser(
       email: string,
       password: string,
     ): Promise<SessionInterface> {
@@ -51,8 +51,8 @@ export class AuthService {
         email: user.email,
         name: user.name,
       };
-    }
-    async validateUserWithGoogle(user: createGoogleUserDto): Promise<SessionInterface> {
+  }
+  async validateUserWithGoogle(user: createGoogleUserDto): Promise<SessionInterface> {
       const existingUser = await this.userService.findByEmail(user.email);
       if (existingUser) {
         return {
@@ -67,8 +67,7 @@ export class AuthService {
         email: new_user.email,
         name: new_user.name,
       };
-    }
-  
+  }
   async verifyTfa(verifyTfaDto: VerifyTfaDto): Promise<SessionInterface> {
     const user = await this.tfaAuthentificationService.verifyTfaToken(verifyTfaDto)
     return user
@@ -107,6 +106,20 @@ export class AuthService {
     });
     res.clearCookie(getEnvOrFatal('COOKIE_NAME'));
     return true;
+  }
+  async signSession(req : Request , user : SessionInterface):Promise<void>{
+    return new Promise<void>((resolve, reject) => {
+          req.login(user, (err) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve();
+          });
+        });
+  }
+  async checkUserValid(userId : string){
+    const user_obj = await this.userService.findOneById(userId)
+    return true
   }
   async passworMatch(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);

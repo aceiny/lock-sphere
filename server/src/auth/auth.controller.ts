@@ -36,17 +36,10 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   async googleAuthRedirect(@GetUser() user : SessionInterface , @Req() req: Request , @Res({passthrough : true}) res: Response) : Promise<void> {
-    if (!user) {
+    if (!user || !user.id) {
       throw new UnauthorizedException('Google authentication failed');
     }
-    console.log(res)
-    await new Promise<void>((resolve, reject) => {
-      req.login(user, (err) => {
-        if (err) return reject(err);
-        resolve();
-      });
-    });
-
+    await this.authService.signSession(req , user)
     return res.redirect(`${this.FRONTEND_URL}/auth/loading`);
   }
 
@@ -107,16 +100,12 @@ export class AuthController {
     @Body() verifyTfaDto: VerifyTfaDto,
     @Req() req : Request,
   ): Promise<ResponseInterface<null>> {
-    const data = await this.authService.verifyTfa(verifyTfaDto);
-    console.log(data)
-    return new Promise((resolve, reject) => {
-      req.login(data, (err) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve({ message: 'TFA verified, session signed', status: HttpStatus.OK });
-      });
-    });
+    const user = await this.authService.verifyTfa(verifyTfaDto);
+    await this.authService.signSession(req , user)
+    return {
+      message : "TFA was succesfully verfied",
+      status : HttpStatus.ACCEPTED
+    }
   }
 
   @ApiOperation({
@@ -124,10 +113,10 @@ export class AuthController {
   })
   @Get('validate-session')
   async validateSession(@GetUser() user: SessionInterface): Promise<ResponseInterface<null>> {
-    console.log(user)
     if(!user || !user.id) {
       throw new UnauthorizedException('Invalid session');
     }
+    await this.authService.checkUserValid(user.id)
     return {
       message: 'Session is valid',
       status: HttpStatus.OK,
