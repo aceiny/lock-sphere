@@ -40,6 +40,7 @@ const TfaDialog = ({
       return
     }
     setIsVerifying(true)
+    console.log(verificationCode)
     mutateEnableTfa(verificationCode , {
       onSuccess: (res) => {
         console.log('res' , res)
@@ -47,7 +48,7 @@ const TfaDialog = ({
         setShow2FADialog(false)
       },
       onError: (error : any) => {
-        showErrorToast(error.response.data.message)
+        showErrorToast(error?.response?.data?.message)
       }
     })
     setIsVerifying(false)

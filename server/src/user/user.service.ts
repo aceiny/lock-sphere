@@ -39,7 +39,7 @@ export class UserService {
     return this.userRepository
     .createQueryBuilder('user')
     .where('user.id = :id' , {id})
-    .addSelect('user.password')
+    .addSelect('user.tfa_secret')
     .getOne()
   }
   async findByEmailWithPassword(email: string): Promise<User | null> {
@@ -86,7 +86,7 @@ export class UserService {
     if(!id){
       throw new UnauthorizedException('User not found');
     }
-    const user = this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: {
         id,
       },

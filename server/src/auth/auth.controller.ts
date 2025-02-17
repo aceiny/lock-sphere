@@ -48,9 +48,11 @@ export class AuthController {
   })
   @Post('signup')
   async signup(
+    @Req() req : Request,
     @Body() createUserDto: CreateUserDto,
   ): Promise<ResponseInterface<null>> {
-    const data = await this.authService.signup(createUserDto);
+    const user = await this.authService.signup(createUserDto);
+    await this.authService.signSession(req,user)
     return {
       message: 'Signup succesfully',
       status: HttpStatus.CREATED,
@@ -116,7 +118,9 @@ export class AuthController {
     if(!user || !user.id) {
       throw new UnauthorizedException('Invalid session');
     }
+    console.log("check session")
     await this.authService.checkUserValid(user.id)
+    console.log('chedk user')
     return {
       message: 'Session is valid',
       status: HttpStatus.OK,

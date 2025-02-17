@@ -40,8 +40,7 @@ export function useSignup() {
       return data
     },
     onSuccess: (data) => {
-      showSuccessToast("Signup succesfull please login")
-      window.location.replace('/login')
+      window.location.replace('/dashboard')
     },
     onError: (error : any) => {
       showErrorToast(error.response?.data?.message)

@@ -50,8 +50,10 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
       if (user.tfa_state != TfaState.PENDING) {
         throw new ConflictException('2FA is not pending for this user');
       }
+      if(!user.tfa_secret) {
+        throw new ConflictException('Try initializing TFA again')
+      }
       const user_tfa_secret = this.decrypt(user.tfa_secret)
-      console.log(user_tfa_secret)
       /// check that the token is valid
       const is_valid = authenticator.verify({
         token,

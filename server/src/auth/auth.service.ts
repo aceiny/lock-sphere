@@ -88,11 +88,16 @@ export class AuthService {
       "new-login",
       { mailDto },
       { attempts: 3, backoff: { type: "exponential", delay: 1000 } },
-      );*/
+      );*/  
     return true;
   }
   async signup(createUserDto: CreateUserDto): Promise<any> {
-    return this.userService.create(createUserDto);
+    const user = await this.userService.create(createUserDto);
+    return {
+      id : user.id,
+      email : user.email,
+      name : user.name
+    }
   }
   async signout(req: Request , res : Response): Promise<boolean> {
     if (!req.session?.passport) {
@@ -119,6 +124,7 @@ export class AuthService {
   }
   async checkUserValid(userId : string){
     const user_obj = await this.userService.findOneById(userId)
+    console.log('user' , user_obj)
     return true
   }
   async passworMatch(password: string, hash: string): Promise<boolean> {
