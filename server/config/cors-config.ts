@@ -3,9 +3,9 @@ import { getEnvOrFatal } from "common/utils/env.util";
 
 export const CorsConfig : CorsOptions= {
   origin: [
-    getEnvOrFatal('FRONTEND_URL'),
+    'https://lock.yxne.tech/',
+    'https://lock.yxne.tech',    
     'http://localhost:3001'
-
   ],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
