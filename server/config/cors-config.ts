@@ -1,6 +1,4 @@
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
-import { getEnvOrFatal } from "common/utils/env.util";
-
 export const CorsConfig : CorsOptions= {
   origin: [
     'https://lock.yxne.tech/',
