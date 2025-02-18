@@ -12,6 +12,6 @@ export const SessionConfig: SessionOptions = {
     maxAge: getEnvOrFatal('COOKIE_EXPIRATION'),
     httpOnly: getEnvOrFatal('COOKIE_HTTP_ONLY'),
     sameSite: getEnvOrFatal('COOKIE_SAME_SITE'),
-    //domain : getEnvOrFatal("COOKIE_DOMAIN"),
+    domain : getEnvOrFatal("COOKIE_DOMAIN"),
   },
 };
