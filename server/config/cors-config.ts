@@ -1,11 +1,12 @@
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
+import { getEnvOrFatal } from "common/utils/env.util";
 export const CorsConfig : CorsOptions= {
   origin: [
-    'https://lock.yxne.tech/',
-    'https://lock.yxne.tech',    
-    'http://localhost:3001'
+    'https://e6e4-154-246-106-78.ngrok-free.app',
+    'http://localhost:3001',
+    'https://sphere.yxne.tech',
+    'https://lock.yxne.tech'
   ],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE']
+  methods: ['GET', 'POST', 'PUT', , 'PATCH' , 'DELETE']
 };
