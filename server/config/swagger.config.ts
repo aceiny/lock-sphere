@@ -23,7 +23,7 @@ export const SetupSwagger = (app: INestApplication): void => {
   // Apply security globally
   document.security = [{ 'session-auth': [] }];
 
-  SwaggerModule.setup('api/docs', app, document, {
+  SwaggerModule.setup('docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
       filter: true,
