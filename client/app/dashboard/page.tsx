@@ -55,33 +55,18 @@ export default function DashboardPage() {
         animate="show"
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
       >
-        <PasswordCard
-          title="Gmail"
-          username="john.doe@gmail.com"
-          lastUpdated="2024-02-11"
-          category="Email"
-          logoUrl="https://www.google.com/gmail/about/static/images/logo-gmail.png?cache=1adba63"
-          password="mysecretpassword123"
-          url="https://gmail.com"
-        />
-        <PasswordCard
-          title="GitHub"
-          username="johndoe"
-          lastUpdated="2024-02-10"
-          category="Development"
-          logoUrl="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-          password="githubpass456"
-          url="https://github.com"
-        />
-        <PasswordCard
-          title="Dropbox"
-          username="john.doe@gmail.com"
-          lastUpdated="2024-02-09"
-          category="Storage"
-          logoUrl="https://aem.dropbox.com/cms/content/dam/dropbox/www/en-us/branding/app-dropbox-ios@2x.png"
-          password="dropbox789"
-          url="https://dropbox.com"
-        />
+        {
+          Array.from({ length: 10 }).map((_, index) => (
+            <PasswordCard
+            title="Dropbox"
+            username="john.doe@gmail.com"
+            lastUpdated="2024-02-09"
+            category="Storage"
+            logoUrl="https://aem.dropbox.com/cms/content/dam/dropbox/www/en-us/branding/app-dropbox-ios@2x.png"
+            password="dropbox789"
+            url="https://dropbox.com"
+          />))
+        }
       </motion.div>
 
       <PasswordDialog open={showAddDialog} onOpenChange={setShowAddDialog} mode="add" />
