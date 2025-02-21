@@ -58,7 +58,7 @@ export function useSignin() {
       return data
     },
     onSuccess: (data) => {
-      window.location.replace('/dashboard')
+      //window.location.replace('/dashboard')
     },
     onError: (error : any) => {
       if(error.response?.data?.message != "Tfa required"){

@@ -12,10 +12,13 @@ import * as passport from 'passport';
 import { SessionConfig } from 'config/session.config';
 import { RedisStore } from 'connect-redis';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as cookieParser from 'cookie-parser';
+import { CsrfMiddleware } from 'common/middlewares/csrf.middleware';
 
 export async function CreateServer(): Promise<NestExpressApplication> {
   const server = await NestFactory.create<NestExpressApplication>(AppModule);
   SetupSwagger(server);
+  server.use(cookieParser());
   const redisClient = server.get('REDIS_CLIENT');
   server.use(
     session({

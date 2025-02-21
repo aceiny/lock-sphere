@@ -4,6 +4,7 @@ export const CorsConfig : CorsOptions= {
   origin: [
     'https://e6e4-154-246-106-78.ngrok-free.app',
     'http://localhost:3001',
+    'http://localhost:3000',
     'https://sphere.yxne.tech',
     'https://lock.yxne.tech'
   ],

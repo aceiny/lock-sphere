@@ -8,7 +8,7 @@ export const SessionConfig: SessionOptions = {
   saveUninitialized: getEnvOrFatal('SESSION_SAVE_UNINITIALIZED'),
   rolling: getEnvOrFatal('SESSION_ROLLING'),
   cookie: {
-    secure: getEnvOrFatal('COOKIE_SECURE'),
+    secure: getEnvOrFatal('APP_ENV') == 'production',
     maxAge: getEnvOrFatal('COOKIE_EXPIRATION'),
     httpOnly: getEnvOrFatal('COOKIE_HTTP_ONLY'),
     sameSite: getEnvOrFatal('COOKIE_SAME_SITE'),
