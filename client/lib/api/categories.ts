@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { Category } from "../types/api"
-import axios from "./axios"
+import axios, { ResponseInterface } from "./axios"
 
 // Create category
 export function useCreateCategory() {
@@ -21,8 +21,8 @@ export function useCategories() {
   return useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const { data } = await axios.get<Category[]>("/category")
-      return data
+      const { data } = await axios.get<ResponseInterface<Category[]>>("/category")
+      return data.data
     },
   })
 }

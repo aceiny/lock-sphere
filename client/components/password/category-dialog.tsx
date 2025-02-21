@@ -25,6 +25,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { useCategories, useCreateCategory, useDeleteCategory, } from "@/lib/api/categories"
+import { Category } from "@/lib/types/api"
 
 interface CategoryDialogProps {
   open: boolean
@@ -32,13 +34,26 @@ interface CategoryDialogProps {
 }
 
 export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
-  const [categories, setCategories] = React.useState(["Social", "Work", "Finance", "Shopping", "Other"])
+  const { data: categories, isLoading } = useCategories()
+  const { mutate: createCategory, isPending: isCreating } = useCreateCategory()
+  const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory()
+  
   const [newCategory, setNewCategory] = React.useState("")
   const [error, setError] = React.useState("")
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
-  const [categoryToDelete, setCategoryToDelete] = React.useState<string | null>(null)
+  const [categoryToDelete, setCategoryToDelete] = React.useState<Category | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Reset form state when dialog closes
+  React.useEffect(() => {
+    if (!open) {
+      setNewCategory("")
+      setError("")
+      setShowDeleteDialog(false)
+      setCategoryToDelete(null)
+    }
+  }, [open])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const trimmedCategory = newCategory.trim()
 
@@ -47,17 +62,23 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
       return
     }
 
-    if (categories.includes(trimmedCategory)) {
+    if (categories?.some(cat => cat.name.toLowerCase() === trimmedCategory.toLowerCase())) {
       setError("Category already exists")
       return
     }
 
-    setCategories((prev) => [...prev, trimmedCategory])
-    setNewCategory("")
-    setError("")
+    createCategory(trimmedCategory, {
+      onError: (error) => {
+        setError(error.message)
+      },
+      onSuccess: () => {
+        setNewCategory("")
+        setError("")
+      }
+    })
   }
 
-  const handleDeleteCategory = (category: string, e: React.MouseEvent) => {
+  const handleDeleteCategory = (category: Category, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setCategoryToDelete(category)
@@ -65,10 +86,16 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
   }
 
   const handleDeleteConfirm = () => {
-    if (categoryToDelete && categoryToDelete !== "Other") {
-      setCategories((prev) => prev.filter((c) => c !== categoryToDelete))
+    if (categoryToDelete && categoryToDelete.name !== "Other") {
+      deleteCategory(categoryToDelete.id, {
+        onError: (error) => {
+          setError(error.message)
+        },
+        onSuccess: () => {
+          handleDeleteCancel()
+        }
+      })
     }
-    handleDeleteCancel()
   }
 
   const handleDeleteCancel = () => {
@@ -97,38 +124,55 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
                     setError("")
                   }}
                   className={cn(error && "border-red-500")}
+                  disabled={isCreating}
                 />
                 {error && <p className="text-sm text-red-500">{error}</p>}
               </div>
               <div className="space-y-2">
                 <Label>Current Categories</Label>
                 <div className="flex flex-wrap gap-2 p-4 rounded-lg border bg-muted/50">
-                  {categories.map((category) => (
-                    <Badge
-                      key={category}
-                      variant="secondary"
-                      className="bg-background hover:bg-accent px-3 py-1 text-sm transition-colors group"
-                    >
-                      {category}
-                      {category !== "Other" && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600"
-                          onClick={(e) => handleDeleteCategory(category, e)}
-                        >
-                          <X className="h-3 w-3" />
-                          <span className="sr-only">Delete {category}</span>
-                        </Button>
-                      )}
-                    </Badge>
-                  ))}
+                  {isLoading ? (
+                    <div className="w-full flex items-center justify-center text-muted-foreground">
+                      Loading categories...
+                    </div>
+                  ) : categories?.length === 0 ? (
+                    <div className="w-full flex items-center justify-center text-muted-foreground">
+                      No categories yet
+                    </div>
+                  ) : (
+                    categories?.map((category) => (
+                      <Badge
+                        key={category.id}
+                        variant="secondary"
+                        className="bg-background hover:bg-accent h-10 px-3 text-sm transition-colors group"
+                      >
+                        {category.name}
+                        {category.name !== "Other" && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600"
+                            onClick={(e) => handleDeleteCategory(category, e)}
+                            disabled={isDeleting}
+                          >
+                            <X className="h-3 w-3" />
+                            <span className="sr-only">Delete {category.name}</span>
+                          </Button>
+                        )}
+                      </Badge>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Add Category</Button>
+              <Button 
+                type="submit" 
+                disabled={isCreating || !newCategory.trim()}
+              >
+                {isCreating ? "Adding..." : "Add Category"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -139,7 +183,7 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Category</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the category "{categoryToDelete}"? This action cannot be undone.
+              Are you sure you want to delete the category "{categoryToDelete?.name}"? This action cannot be undone.
               All passwords in this category will be moved to "Other".
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -148,8 +192,9 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
             <AlertDialogAction
               onClick={handleDeleteConfirm}
               className="bg-red-600 text-white hover:bg-red-700 dark:hover:bg-red-700"
+              disabled={isDeleting}
             >
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -157,4 +202,3 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
     </>
   )
 }
-
