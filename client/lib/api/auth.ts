@@ -91,6 +91,7 @@ export function useVerifyTFA() {
       return data
     },
     onSuccess(res){
+      sessionStorage.removeItem('tfa-challange')
       window.location.replace('/dashboard')
     },
     onError(error : any){
