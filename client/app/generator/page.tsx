@@ -6,16 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Copy, RefreshCw, Check, Zap } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 
 type Strength = "weak" | "medium" | "strong";
 
-const strengthColors: Record<Strength, string> = {
-  weak: "bg-destructive",
-  medium: "bg-yellow-500",
-  strong: "bg-green-500",
+const strengthVariants: Record<Strength, "success" | "destructive" | "secondary"> = {
+  weak: "destructive",
+  medium: "secondary",
+  strong: "success",
 };
 
 const generatePassword = (length: number, options: { uppercase: boolean; lowercase: boolean; numbers: boolean; symbols: boolean }): string => {
@@ -42,12 +43,75 @@ const generatePassword = (length: number, options: { uppercase: boolean; lowerca
 };
 
 const getPasswordStrength = (password: string): Strength => {
+  let score = 0;
+  
+  if (password.length >= 16) {
+    score += 3;
+  } else if (password.length >= 12) {
+    score += 2;
+  } else if (password.length >= 8) {
+    score += 1;
+  }
+
   const hasUpper = /[A-Z]/.test(password);
   const hasLower = /[a-z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
-  const hasSymbol = /[!@#$%^&*()_+{}[\]<>?/]/.test(password);
-  const score = [hasUpper, hasLower, hasNumber, hasSymbol].filter(Boolean).length;
-  return score <= 2 ? "weak" : score === 3 ? "medium" : "strong";
+  const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};:'",.<>/?\\|`~]/.test(password);
+
+  if (hasUpper) score += 1;
+  if (hasLower) score += 1;
+  if (hasNumber) score += 1;
+  if (hasSymbol) score += 1;
+
+  const repeatedChars = /(.)\1{2,}/;
+  if (repeatedChars.test(password)) {
+    score -= 1;
+  }
+
+  const sequences = ['abcdefghijklmnopqrstuvwxyz', '0123456789', 'qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  const lowercasePassword = password.toLowerCase();
+  
+  let hasSequential = false;
+  for (const sequence of sequences) {
+    for (let i = 3; i <= sequence.length; i++) {
+      for (let j = 0; j <= sequence.length - i; j++) {
+        const substr = sequence.substr(j, i);
+        if (lowercasePassword.includes(substr) || 
+            lowercasePassword.includes(substr.split('').reverse().join(''))) {
+          hasSequential = true;
+          break;
+        }
+      }
+      if (hasSequential) break;
+    }
+    if (hasSequential) {
+      score -= 1;
+      break;
+    }
+  }
+
+  const commonPatterns = [
+    'password', '123456', 'qwerty', 'admin', 'welcome', 
+    'letmein', 'monkey', 'abc123', 'football'
+  ];
+
+  for (const pattern of commonPatterns) {
+    if (lowercasePassword.includes(pattern)) {
+      score -= 2;
+      break;
+    }
+  }
+
+  const uniqueChars = new Set(password).size;
+  const entropy = Math.log2(Math.pow(uniqueChars, password.length));
+  if (entropy > 60) score += 1;
+  if (entropy > 80) score += 1;
+
+  score = Math.max(0, score);
+
+  if (score <= 3) return "weak";
+  if (score <= 6) return "medium";
+  return "strong";
 };
 
 export default function GeneratorPage() {
@@ -101,16 +165,18 @@ export default function GeneratorPage() {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>Password Length: {length}</Label>
-                <span className="text-sm text-muted-foreground">
-                  Strength:
-                  <span className={`ml-2 inline-flex items-center text-${strengthColors[strength]}`}>
-                    <Zap className="h-4 w-4 mr-1" />
-                    {strength.charAt(0).toUpperCase() + strength.slice(1)}
-                  </span>
-                </span>
+                <Label>Password Length:</Label>
+                <Input
+                  type="number"
+                  value={length}
+                  onChange={(e) => setLength(Math.max(8, Math.min(128, Number(e.target.value))))}
+                  className="w-20 text-center appearance-none"
+                />
+                <Badge variant={strengthVariants[strength]} className="ml-2">
+                  {strength.charAt(0).toUpperCase() + strength.slice(1)}
+                </Badge>
               </div>
-              <Slider value={[length]} max={32} min={8} step={1} onValueChange={(val) => setLength(val[0])} />
+              <Slider value={[length]} max={128} min={8} step={1} onValueChange={(val) => setLength(val[0])} />
             </div>
 
             {Object.entries(options).map(([key, value]) => (
