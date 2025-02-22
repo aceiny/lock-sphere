@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import * as React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -16,39 +16,53 @@ import { DeleteConfirmationDialog } from "../utils/delete-confarmation-dialog";
 import { PasswordCardActions } from "./password-card-actions";
 
 interface PasswordCardProps {
-  title: string;
-  username: string;
+  website_name: string;
+  identifier: string;
   lastUpdated: string;
   category?: string;
-  logoUrl?: string;
-  password: string;
-  url?: string;
+  encrypted_payload: string;
+  website_url?: string;
 }
 
 export function PasswordCard({
-  title,
-  username,
+  website_name,
+  identifier,
   lastUpdated,
   category = "Other",
-  logoUrl,
-  password,
-  url,
+  encrypted_payload,
+  website_url,
 }: PasswordCardProps) {
   const [showViewDialog, setShowViewDialog] = React.useState(false);
-  const [showEditDialog, setShowEditDialog] = React.useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
+  const [logo, setLogo] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const response = await fetch(
+          `https://autocomplete.clearbit.com/v1/companies/suggest?query=${website_name}`,
+        );
+        const data = await response.json();
+        if (data.length > 0) {
+          setLogo(data[0].logo);
+        }
+      } catch (error) {
+        console.error("Error fetching logo:", error);
+      }
+    };
+    fetchLogo();
+  }, [website_name]);
 
   const handleCopy = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    navigator.clipboard.writeText(username);
+    navigator.clipboard.writeText(identifier);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Check if the click target is part of the dropdown menu or copy button
     const target = e.target as HTMLElement;
     if (
       target.closest('[role="menu"]') ||
@@ -79,23 +93,23 @@ export function PasswordCard({
                 className="relative h-8 w-8 overflow-hidden rounded-full bg-muted"
                 whileHover={{ scale: 1.1 }}
               >
-                {logoUrl ? (
+                {logo ? (
                   <Image
-                    src={logoUrl || "/placeholder.svg"}
-                    alt={title}
+                    src={logo}
+                    alt={website_name}
                     fill
                     className="object-cover"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-primary/10">
                     <span className="text-lg font-semibold text-primary">
-                      {title[0].toUpperCase()}
+                      {website_name[0].toUpperCase()}
                     </span>
                   </div>
                 )}
               </motion.div>
               <div>
-                <div className="font-semibold">{title}</div>
+                <div className="font-semibold">{website_name}</div>
                 <Badge
                   variant="secondary"
                   className="mt-1 bg-primary/10 hover:bg-primary/20 transition-colors"
@@ -106,13 +120,12 @@ export function PasswordCard({
             </div>
             <PasswordCardActions
               onView={() => setShowViewDialog(true)}
-              onEdit={() => setShowEditDialog(true)}
               onDelete={() => setShowDeleteDialog(true)}
-              url={url}
+              url={website_url}
             />
           </CardHeader>
           <CardContent>
-            <div className="text-sm text-muted-foreground">{username}</div>
+            <div className="text-sm text-muted-foreground">{identifier}</div>
           </CardContent>
           <CardFooter className="flex justify-between">
             <div className="text-xs text-muted-foreground">
@@ -141,7 +154,7 @@ export function PasswordCard({
                   Copied!
                 </Badge>
               </motion.div>
-              <span className="sr-only">Copy username</span>
+              <span className="sr-only">Copy identifier</span>
             </Button>
           </CardFooter>
         </Card>
@@ -152,35 +165,19 @@ export function PasswordCard({
         onOpenChange={setShowViewDialog}
         mode="view"
         data={{
-          title,
-          username,
-          password,
+          website_name,
+          identifier,
+          encrypted_payload,
           category,
-          url,
+          website_url,
         }}
       />
 
-      <PasswordDialog
-        open={showEditDialog}
-        onOpenChange={setShowEditDialog}
-        mode="edit"
-        data={{
-          title,
-          username,
-          password,
-          category,
-          url,
-        }}
-      />
-  
-    <DeleteConfirmationDialog
+      <DeleteConfirmationDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        title={title}
-        onConfirm={() => {
-          // TODO: Implement delete functionality
-          setShowDeleteDialog(false);
-        }}
+        title={website_name}
+        onConfirm={() => setShowDeleteDialog(false)}
       />
     </>
   );

@@ -1,8 +1,17 @@
-import { BadRequestException, HttpStatus, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
-import { createGoogleUserDto, CreateUserDto } from 'src/user/types/create-user.dto';
+import {
+  createGoogleUserDto,
+  CreateUserDto,
+} from 'src/user/types/create-user.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { SendEmailOptions } from 'src/mail/interfaces/send-email.interface';
@@ -23,53 +32,59 @@ export class AuthService {
     @InjectQueue('email-queue') private emailQueue: Queue,
   ) {}
   async validateUser(
-      email: string,
-      password: string,
-    ): Promise<SessionInterface> {
-      email = email.trim().toLowerCase();
-      const user = await this.userService.findByEmailWithPassword(email);
-      if (!user) {
-        throw new BadRequestException('Invalid credentials');
-      }
-      const passwordMatch: boolean = await this.passworMatch(
-        password,
-        user.password,
-      );
-      if (!passwordMatch) {
-        throw new BadRequestException('Invalid credentials');
-      }
-      if (user.tfa_state == TfaState.ENABLED) {
-        const encryped_challange = await this.tfaAuthentificationService.generateTfaTokenChallenge(user.id);
-        throw new UnauthorizedException({
-          message: "Tfa required",
-          challange: encryped_challange,
-        });
-      }
-      return {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-      };
+    email: string,
+    password: string,
+  ): Promise<SessionInterface> {
+    email = email.trim().toLowerCase();
+    const user = await this.userService.findByEmailWithPassword(email);
+    if (!user) {
+      throw new BadRequestException('Invalid credentials');
+    }
+    const passwordMatch: boolean = await this.passworMatch(
+      password,
+      user.password,
+    );
+    if (!passwordMatch) {
+      throw new BadRequestException('Invalid credentials');
+    }
+    if (user.tfa_state == TfaState.ENABLED) {
+      const encryped_challange =
+        await this.tfaAuthentificationService.generateTfaTokenChallenge(
+          user.id,
+        );
+      throw new UnauthorizedException({
+        message: 'Tfa required',
+        challange: encryped_challange,
+      });
+    }
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    };
   }
-  async validateUserWithGoogle(user: createGoogleUserDto): Promise<SessionInterface> {
-      const existingUser = await this.userService.findByEmail(user.email);
-      if (existingUser) {
-        return {
-          id: existingUser.id,
-          email: existingUser.email,
-          name: existingUser.name,
-        };
-      }
-      const new_user = await this.userService.createWithGoogle(user)
+  async validateUserWithGoogle(
+    user: createGoogleUserDto,
+  ): Promise<SessionInterface> {
+    const existingUser = await this.userService.findByEmail(user.email);
+    if (existingUser) {
       return {
-        id: new_user.id,
-        email: new_user.email,
-        name: new_user.name,
+        id: existingUser.id,
+        email: existingUser.email,
+        name: existingUser.name,
       };
+    }
+    const new_user = await this.userService.createWithGoogle(user);
+    return {
+      id: new_user.id,
+      email: new_user.email,
+      name: new_user.name,
+    };
   }
   async verifyTfa(verifyTfaDto: VerifyTfaDto): Promise<SessionInterface> {
-    const user = await this.tfaAuthentificationService.verifyTfaToken(verifyTfaDto)
-    return user
+    const user =
+      await this.tfaAuthentificationService.verifyTfaToken(verifyTfaDto);
+    return user;
   }
   async signin(req: Request, user: SessionInterface): Promise<any> {
     const mailDto: SendEmailOptions = {
@@ -87,18 +102,18 @@ export class AuthService {
       "new-login",
       { mailDto },
       { attempts: 3, backoff: { type: "exponential", delay: 1000 } },
-      );*/  
+      );*/
     return true;
   }
   async signup(createUserDto: CreateUserDto): Promise<any> {
     const user = await this.userService.create(createUserDto);
     return {
-      id : user.id,
-      email : user.email,
-      name : user.name
-    }
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    };
   }
-  async signout(req: Request , res : Response): Promise<boolean> {
+  async signout(req: Request, res: Response): Promise<boolean> {
     if (!req.session?.passport) {
       throw new UnauthorizedException('Session not found');
     }
@@ -111,19 +126,19 @@ export class AuthService {
     res.clearCookie(getEnvOrFatal('COOKIE_NAME'));
     return true;
   }
-  async signSession(req : Request , user : SessionInterface):Promise<void>{
+  async signSession(req: Request, user: SessionInterface): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-          req.login(user, (err) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve();
-          });
-        });
+      req.login(user, (err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      });
+    });
   }
-  async checkUserValid(userId : string){
-    const user_obj = await this.userService.findOneById(userId)
-    return true
+  async checkUserValid(userId: string) {
+    const user_obj = await this.userService.findOneById(userId);
+    return true;
   }
   async passworMatch(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);

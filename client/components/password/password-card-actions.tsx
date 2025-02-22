@@ -10,14 +10,12 @@ import {
 
 interface PasswordCardActionsProps {
   onView: () => void;
-  onEdit: () => void;
   onDelete: () => void;
   url?: string;
 }
 
 export function PasswordCardActions({
   onView,
-  onEdit,
   onDelete,
   url,
 }: PasswordCardActionsProps) {
@@ -38,10 +36,6 @@ export function PasswordCardActions({
         <DropdownMenuItem onSelect={onView}>
           <Eye className="mr-2 h-4 w-4" />
           View Details
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={onEdit}>
-          <Pencil className="mr-2 h-4 w-4" />
-          Edit
         </DropdownMenuItem>
         {url && (
           <DropdownMenuItem onSelect={() => window.open(url, "_blank")}>

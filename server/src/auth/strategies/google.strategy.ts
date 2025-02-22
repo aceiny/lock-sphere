@@ -7,9 +7,7 @@ import { GoogleConfig } from 'config/google.config';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(
-    private readonly authService: AuthService,
-  ) {
+  constructor(private readonly authService: AuthService) {
     super(GoogleConfig);
   }
 
@@ -21,7 +19,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   ): Promise<any> {
     const user = {
       email: profile.emails[0].value,
-      name : `${profile.name.givenName} ${profile.name.familyName}`,
+      name: `${profile.name.givenName} ${profile.name.familyName}`,
       profile_picture: profile.photos[0].value,
     };
     const created_user = await this.authService.validateUserWithGoogle(user);

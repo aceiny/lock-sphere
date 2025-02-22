@@ -2,18 +2,19 @@
 import { useState, useEffect } from "react";
 import crypto from "crypto";
 import secureLocalStorage from "react-secure-storage";
+import { useCreateOrCheckMasterKey } from "./api/user";
+import {
+  showErrorToast,
+  showSuccessToast,
+} from "@/components/utils/toast-handler";
 
 const MASTER_KEY_STORAGE = "master_key";
-const SALT_STORAGE = "master_salt";
+const FIXED_SALT = Buffer.from("TMlcjETN0bRuowgtY8zlwpM4qOHZcLjRK+", "base64"); // Use Buffer for consistency
 
-/**
- * Derives a secure hash from the master key using PBKDF2.
- * @param {string} masterKey - The user's master key.
- * @param {string} salt - A unique salt for hashing.
- * @returns {string} The derived hash.
- */
-function deriveMasterKeyHash(masterKey: string, salt: string): string {
-  return crypto.pbkdf2Sync(masterKey, salt, 100000, 64, "sha256").toString("hex");
+function deriveMasterKeyHash(masterKey: string): string {
+  return crypto
+    .pbkdf2Sync(masterKey, FIXED_SALT, 100000, 64, "sha256")
+    .toString("hex");
 }
 
 export function useMasterKey() {
@@ -26,42 +27,27 @@ export function useMasterKey() {
       setMasterKey(storedKey as string);
       setIsVerified(true);
     }
-  }, []);
+  }, [masterKey, isVerified]);
 
-  /**
-   * Stores the master key securely on the client.
-   * @param {string} key - The master key entered by the user.
-   */
-  function storeMasterKey(key: string) {
-    const salt = crypto.randomBytes(16).toString("hex"); // Generate a new salt
-    const derivedKey = deriveMasterKeyHash(key, salt);
-    
-    secureLocalStorage.setItem(MASTER_KEY_STORAGE, derivedKey);
-    secureLocalStorage.setItem(SALT_STORAGE, salt);
-    setMasterKey(derivedKey);
-    setIsVerified(true);
-  }
+  const { mutate: mutateCreateOrCheckMasterKey } = useCreateOrCheckMasterKey();
 
-  /**
-   * Verifies if the entered master key is correct by rehashing it.
-   * @param {string} key - The master key entered by the user.
-   * @returns {boolean} True if the key is correct, false otherwise.
-   */
-  function verifyMasterKey(key: string): boolean {
-    const storedSalt = secureLocalStorage.getItem(SALT_STORAGE) as string;
-    const storedHash = secureLocalStorage.getItem(MASTER_KEY_STORAGE) as string;
+  function handleMasterKey(key: string) {
+    const hashedKey = deriveMasterKeyHash(key);
 
-    if (!storedSalt || !storedHash) return false;
-
-    const inputHash = deriveMasterKeyHash(key, storedSalt);
-    const isValid = inputHash === storedHash;
-
-    if (isValid) {
-      setMasterKey(inputHash);
-      setIsVerified(true);
-    }
-    
-    return isValid;
+    mutateCreateOrCheckMasterKey(hashedKey, {
+      onSuccess: (data: any) => {
+        secureLocalStorage.setItem(MASTER_KEY_STORAGE, hashedKey);
+        setMasterKey(hashedKey);
+        setIsVerified(true);
+        showSuccessToast(data.message);
+        window.location.reload(); // for now untill i debug why master key not syncing
+      },
+      onError: (error: any) => {
+        showErrorToast(
+          error.response?.data?.message || "Failed to verify master key",
+        );
+      },
+    });
   }
 
   /**
@@ -69,10 +55,9 @@ export function useMasterKey() {
    */
   function clearMasterKey() {
     secureLocalStorage.removeItem(MASTER_KEY_STORAGE);
-    secureLocalStorage.removeItem(SALT_STORAGE);
     setMasterKey(null);
     setIsVerified(false);
   }
 
-  return { masterKey, isVerified, storeMasterKey, verifyMasterKey, clearMasterKey };
+  return { masterKey, isVerified, handleMasterKey, clearMasterKey };
 }

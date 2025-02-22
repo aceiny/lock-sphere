@@ -16,24 +16,29 @@ export class User extends ChronoEntity {
 
   @Column({ type: 'varchar', length: 255, select: false })
   password: string;
-  
+
   @Column({ type: 'boolean', default: false })
   is_email_verified: boolean;
-  
-  @Column({ type: 'varchar', length: 255, nullable: true , default : getEnvOrFatal('DEFAULT_PROFILE_PICTURE')})
-  profile_picture : string;
-  
+
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    default: getEnvOrFatal('DEFAULT_PROFILE_PICTURE'),
+  })
+  profile_picture: string;
+
   @Column({ type: 'enum', enum: TfaState, default: TfaState.DISABLED })
   tfa_state: TfaState;
 
-  @Column({ type: 'varchar', length: 255, select: false , nullable : true })
-  tfa_secret : string
-  
-  @Column({ type: 'varchar', length: 255, select: false , nullable : true })
-  master_key : string
+  @Column({ type: 'varchar', length: 255, select: false, nullable: true })
+  tfa_secret: string;
+
+  @Column({ type: 'varchar', length: 255, select: false, nullable: true })
+  master_key: string;
   @BeforeInsert()
   async hashPassword() {
-    if(!this.password){
+    if (!this.password) {
       this.password = randomBytes(12).toString('hex');
     }
     this.password = await bcrypt.hash(this.password, 10);

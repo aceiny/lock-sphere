@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/utils/LoadingScreen";
 
@@ -7,7 +7,7 @@ const AuthLoading = () => {
   router.replace("/dashboard");
   return (
     <div>
-        <LoadingScreen />
+      <LoadingScreen />
     </div>
   );
 };

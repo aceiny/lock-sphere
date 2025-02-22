@@ -12,7 +12,7 @@ export class CreateUserDto {
   @IsStrongPassword()
   password: string;
 }
-export class createGoogleUserDto{
+export class createGoogleUserDto {
   @IsEmail()
   email: string;
 

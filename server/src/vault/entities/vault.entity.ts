@@ -1,16 +1,7 @@
 import { ChronoEntity } from 'abtract/entity.abstract';
 import { Category } from 'src/category/entities/category.entity';
 import { User } from 'src/user/entities/user.entity';
-import {
-  Column,
-  Entity,
-  Index,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  RelationId,
-} from 'typeorm';
+import { Column, Entity, Index, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Vault extends ChronoEntity {
@@ -43,7 +34,6 @@ export class Vault extends ChronoEntity {
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToMany(() => Category, { nullable: true })
-  @JoinTable()
-  categories: Category[];
+  @ManyToOne(() => Category, { nullable: true, onDelete: 'SET NULL' })
+  category: Category;
 }

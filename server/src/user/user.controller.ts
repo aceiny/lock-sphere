@@ -90,28 +90,31 @@ export class UserController {
       status: HttpStatus.OK,
     };
   }
-  @ApiOperation({summary : 'update user avatar'})
+  @ApiOperation({ summary: 'update user avatar' })
   @ApiCookieAuth('session-auth')
   @Post('/master-key')
   async createOrCheckMasterKey(
     @GetUser() user: SessionInterface,
-    @Body() createOrCheckMasterKeyDto : CreateOrCheckMasterKeyDto
-  ) : Promise<ResponseInterface<undefined>>{
-    const {message} = await this.userService.createOrCheckMasterKey(user.id , createOrCheckMasterKeyDto);
+    @Body() createOrCheckMasterKeyDto: CreateOrCheckMasterKeyDto,
+  ): Promise<ResponseInterface<undefined>> {
+    const { message } = await this.userService.createOrCheckMasterKey(
+      user.id,
+      createOrCheckMasterKeyDto,
+    );
     return {
       message,
-      status : HttpStatus.OK
-    }
+      status: HttpStatus.OK,
+    };
   }
-  @ApiOperation({summary : 'update user avatar'})
+  @ApiOperation({ summary: 'update user avatar' })
   @ApiCookieAuth('session-auth')
   @Patch('/update-avatar')
-  @UseInterceptors(FileInterceptor('avatar' , MulterConfig))
+  @UseInterceptors(FileInterceptor('avatar', MulterConfig))
   async updateAvatar(
     @GetUser() user: SessionInterface,
-    @UploadedFile() avatar : Express.Multer.File
-  ): Promise<any> /*ResponseInterface<User>> */{
-      const data = await this.userService.updateAvatar(user.id , avatar);
+    @UploadedFile() avatar: Express.Multer.File,
+  ): Promise<any> /*ResponseInterface<User>> */ {
+    const data = await this.userService.updateAvatar(user.id, avatar);
     return {
       message: 'Avatar updated',
       status: HttpStatus.OK,

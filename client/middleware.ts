@@ -16,7 +16,11 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
       });
       isValidSession = sessionCheck.status === 200;
     } catch (error: any) {
-      console.error("Session validation failed:", error?.response?.status, error?.message);
+      console.error(
+        "Session validation failed:",
+        error?.response?.status,
+        error?.message,
+      );
     }
   }
 

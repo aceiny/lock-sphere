@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, Matches } from 'class-validator';
 export class VerifyTfaDto {
   @Matches(/^\d{6}$/)
   token: string;
-  
+
   @IsString()
   @IsNotEmpty()
   challange: string;
@@ -11,5 +11,4 @@ export class VerifyTfaDto {
 export class VerifyTfaSetupDto {
   @Matches(/^\d{6}$/)
   token: string;
-  
 }

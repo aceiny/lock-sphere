@@ -1,47 +1,58 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { Shield, ChevronLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
-import { routes } from "@/constants/navigation"
+import * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Shield, ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import { routes } from "@/constants/navigation";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Sidebar({ className }: SidebarProps) {
-  const [isCollapsed, setIsCollapsed] = React.useState(false)
-  const [open, setOpen] = React.useState(false)
-  const pathname = usePathname()
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const pathname = usePathname();
 
   return (
     <TooltipProvider>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="md:hidden fixed top-4 left-4 z-40 hover:bg-accent/50"
           >
             <span className="sr-only">Toggle navigation menu</span>
             <div className="w-6 h-5 flex flex-col justify-between">
-              <div className={cn(
-                "w-full h-0.5 bg-foreground transition-all duration-300",
-                open ? "rotate-45 translate-y-2" : "hover:w-3/4"
-              )} />
-              <div className={cn(
-                "w-full h-0.5 bg-foreground transition-all duration-300",
-                open && "opacity-0"
-              )} />
-              <div className={cn(
-                "w-full h-0.5 bg-foreground transition-all duration-300",
-                open ? "-rotate-45 -translate-y-2" : "w-1/2 hover:w-full"
-              )} />
+              <div
+                className={cn(
+                  "w-full h-0.5 bg-foreground transition-all duration-300",
+                  open ? "rotate-45 translate-y-2" : "hover:w-3/4",
+                )}
+              />
+              <div
+                className={cn(
+                  "w-full h-0.5 bg-foreground transition-all duration-300",
+                  open && "opacity-0",
+                )}
+              />
+              <div
+                className={cn(
+                  "w-full h-0.5 bg-foreground transition-all duration-300",
+                  open ? "-rotate-45 -translate-y-2" : "w-1/2 hover:w-full",
+                )}
+              />
             </div>
           </Button>
         </SheetTrigger>
@@ -66,16 +77,26 @@ export function Sidebar({ className }: SidebarProps) {
           size="icon"
           className={cn(
             "absolute -right-4 top-6 h-8 w-8 rounded-full border bg-background shadow-md",
-            "hover:bg-accent/80 hover:scale-105 transition-all duration-300"
+            "hover:bg-accent/80 hover:scale-105 transition-all duration-300",
           )}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
-          <ChevronLeft className={cn("h-4 w-4 transition-transform duration-300", isCollapsed && "rotate-180")} />
-          <span className="sr-only">{isCollapsed ? "Expand" : "Collapse"} sidebar</span>
+          <ChevronLeft
+            className={cn(
+              "h-4 w-4 transition-transform duration-300",
+              isCollapsed && "rotate-180",
+            )}
+          />
+          <span className="sr-only">
+            {isCollapsed ? "Expand" : "Collapse"} sidebar
+          </span>
         </Button>
         <div className="flex flex-col h-full">
-          <motion.div 
-            className={cn("flex items-center h-16 px-6", isCollapsed && "justify-center px-2")}
+          <motion.div
+            className={cn(
+              "flex items-center h-16 px-6",
+              isCollapsed && "justify-center px-2",
+            )}
             animate={{ opacity: 1 }}
             initial={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
@@ -124,7 +145,9 @@ export function Sidebar({ className }: SidebarProps) {
                         </motion.div>
                       </AnimatePresence>
                       {!isCollapsed && (
-                        <span className="font-medium transition-colors duration-300">{route.label}</span>
+                        <span className="font-medium transition-colors duration-300">
+                          {route.label}
+                        </span>
                       )}
                       {!isCollapsed && pathname === route.href && (
                         <motion.div
@@ -147,15 +170,15 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
       </motion.nav>
     </TooltipProvider>
-  )
+  );
 }
 
 function MobileNav({
   pathname,
   setOpen,
 }: {
-  pathname: string
-  setOpen: (open: boolean) => void
+  pathname: string;
+  setOpen: (open: boolean) => void;
 }) {
   return (
     <ScrollArea className="h-full py-6">
@@ -196,7 +219,9 @@ function MobileNav({
                   <route.icon className="h-5 w-5" />
                 </motion.div>
               </AnimatePresence>
-              <span className="font-medium transition-colors duration-300">{route.label}</span>
+              <span className="font-medium transition-colors duration-300">
+                {route.label}
+              </span>
               {pathname === route.href && (
                 <motion.div
                   layoutId="activeRouteMobile"
@@ -209,5 +234,5 @@ function MobileNav({
         </div>
       </div>
     </ScrollArea>
-  )
+  );
 }

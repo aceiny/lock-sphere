@@ -22,10 +22,12 @@ import { SessionMiddleware } from 'common/middlewares/session.middleware';
     CategoryModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, GoogleStrategy , Session],
+  providers: [AuthService, LocalStrategy, GoogleStrategy, Session],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SessionMiddleware).forRoutes({path : 'auth/validate-session' , method : RequestMethod.GET });
+    consumer
+      .apply(SessionMiddleware)
+      .forRoutes({ path: 'auth/validate-session', method: RequestMethod.GET });
   }
 }

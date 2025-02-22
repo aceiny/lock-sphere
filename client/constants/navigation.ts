@@ -1,4 +1,4 @@
-import { LayoutDashboard, KeySquare, Code2 } from "lucide-react"
+import { LayoutDashboard, KeySquare, Code2 } from "lucide-react";
 
 export const routes = [
   {
@@ -16,5 +16,4 @@ export const routes = [
     icon: Code2,
     href: "/developer",
   },
-]
-
+];

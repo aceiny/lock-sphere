@@ -1,9 +1,10 @@
-import { Shield, Key, Lock } from "lucide-react"
+import { Shield, Key, Lock } from "lucide-react";
 
 export const landingData = {
   name: "LockSphere",
   title: "Secure Password Management",
-  description: "Keep your passwords safe and accessible with our zero-knowledge encryption technology",
+  description:
+    "Keep your passwords safe and accessible with our zero-knowledge encryption technology",
   features: [
     {
       title: "Zero-Knowledge Encryption",
@@ -12,7 +13,8 @@ export const landingData = {
     },
     {
       title: "Secure Password Generator",
-      description: "Create strong, unique passwords with our built-in generator",
+      description:
+        "Create strong, unique passwords with our built-in generator",
       icon: Lock,
     },
     {
@@ -21,5 +23,4 @@ export const landingData = {
       icon: Shield,
     },
   ],
-}
-
+};

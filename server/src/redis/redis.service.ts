@@ -10,7 +10,7 @@ export class RedisService {
   async DeleteKey(key: string): Promise<any> {
     return await this.redisClient.del(key);
   }
-  async GetKey(key: string , parse : boolean = false): Promise<any> {
+  async GetKey(key: string, parse: boolean = false): Promise<any> {
     switch (parse) {
       case true:
         return JSON.parse(await this.redisClient.get(key));
@@ -19,7 +19,12 @@ export class RedisService {
     }
   }
 
-  async SetKey(key: string, value: string, ttl?: number , stringify : boolean = false) {
+  async SetKey(
+    key: string,
+    value: string,
+    ttl?: number,
+    stringify: boolean = false,
+  ) {
     if (ttl) {
       switch (stringify) {
         case true:

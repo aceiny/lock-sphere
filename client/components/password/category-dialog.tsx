@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { X } from 'lucide-react'
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,88 +20,97 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-import { useCategories, useCreateCategory, useDeleteCategory, } from "@/lib/api/categories"
-import { Category } from "@/lib/types/api"
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import {
+  useCategories,
+  useCreateCategory,
+  useDeleteCategory,
+} from "@/lib/api/categories";
+import { Category } from "@/lib/types/api";
 
 interface CategoryDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
-  const { data: categories, isLoading } = useCategories()
-  const { mutate: createCategory, isPending: isCreating } = useCreateCategory()
-  const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory()
-  
-  const [newCategory, setNewCategory] = React.useState("")
-  const [error, setError] = React.useState("")
-  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
-  const [categoryToDelete, setCategoryToDelete] = React.useState<Category | null>(null)
+  const { data: categories, isLoading } = useCategories();
+  const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
+  const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
+
+  const [newCategory, setNewCategory] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  const [categoryToDelete, setCategoryToDelete] =
+    React.useState<Category | null>(null);
 
   // Reset form state when dialog closes
   React.useEffect(() => {
     if (!open) {
-      setNewCategory("")
-      setError("")
-      setShowDeleteDialog(false)
-      setCategoryToDelete(null)
+      setNewCategory("");
+      setError("");
+      setShowDeleteDialog(false);
+      setCategoryToDelete(null);
     }
-  }, [open])
+  }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const trimmedCategory = newCategory.trim()
+    e.preventDefault();
+    const trimmedCategory = newCategory.trim();
 
     if (!trimmedCategory) {
-      setError("Category name cannot be empty")
-      return
+      setError("Category name cannot be empty");
+      return;
     }
 
-    if (categories?.some(cat => cat.name.toLowerCase() === trimmedCategory.toLowerCase())) {
-      setError("Category already exists")
-      return
+    if (
+      categories?.some(
+        (cat) => cat.name.toLowerCase() === trimmedCategory.toLowerCase(),
+      )
+    ) {
+      setError("Category already exists");
+      return;
     }
 
     createCategory(trimmedCategory, {
       onError: (error) => {
-        setError(error.message)
+        setError(error.message);
       },
       onSuccess: () => {
-        setNewCategory("")
-        setError("")
-      }
-    })
-  }
+        setNewCategory("");
+        setError("");
+      },
+    });
+  };
 
   const handleDeleteCategory = (category: Category, e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setCategoryToDelete(category)
-    setShowDeleteDialog(true)
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    setCategoryToDelete(category);
+    setShowDeleteDialog(true);
+  };
 
   const handleDeleteConfirm = () => {
     if (categoryToDelete && categoryToDelete.name !== "Other") {
       deleteCategory(categoryToDelete.id, {
         onError: (error) => {
-          setError(error.message)
+          setError(error.message);
         },
         onSuccess: () => {
-          handleDeleteCancel()
-        }
-      })
+          handleDeleteCancel();
+        },
+      });
     }
-  }
+  };
 
   const handleDeleteCancel = () => {
-    setShowDeleteDialog(false)
-    setCategoryToDelete(null)
-  }
+    setShowDeleteDialog(false);
+    setCategoryToDelete(null);
+  };
 
   return (
     <>
@@ -109,7 +118,9 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Manage Categories</DialogTitle>
-            <DialogDescription>Add or remove password categories</DialogDescription>
+            <DialogDescription>
+              Add or remove password categories
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
             <div className="space-y-4">
@@ -120,8 +131,8 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
                   placeholder="Enter category name"
                   value={newCategory}
                   onChange={(e) => {
-                    setNewCategory(e.target.value)
-                    setError("")
+                    setNewCategory(e.target.value);
+                    setError("");
                   }}
                   className={cn(error && "border-red-500")}
                   disabled={isCreating}
@@ -157,7 +168,9 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
                             disabled={isDeleting}
                           >
                             <X className="h-3 w-3" />
-                            <span className="sr-only">Delete {category.name}</span>
+                            <span className="sr-only">
+                              Delete {category.name}
+                            </span>
                           </Button>
                         )}
                       </Badge>
@@ -167,8 +180,8 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
               </div>
             </div>
             <DialogFooter>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isCreating || !newCategory.trim()}
               >
                 {isCreating ? "Adding..." : "Add Category"}
@@ -183,12 +196,15 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Category</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the category "{categoryToDelete?.name}"? This action cannot be undone.
-              All passwords in this category will be moved to "Other".
+              Are you sure you want to delete the category "
+              {categoryToDelete?.name}"? This action cannot be undone. All
+              passwords in this category will be moved to "Other".
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
               className="bg-red-600 text-white hover:bg-red-700 dark:hover:bg-red-700"
@@ -200,5 +216,5 @@ export function CategoryDialog({ open, onOpenChange }: CategoryDialogProps) {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }

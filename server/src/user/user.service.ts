@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import {  createGoogleUserDto, CreateUserDto } from './types/create-user.dto';
+import { createGoogleUserDto, CreateUserDto } from './types/create-user.dto';
 import { UpdateUserDto } from './types/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,7 +17,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-  // user service 
+  // user service
   async checkUsedEmail(email: string): Promise<boolean | void> {
     const user = await this.userRepository.findOne({
       where: {
@@ -36,19 +36,19 @@ export class UserService {
       },
     });
   }
-  async findOneByIdWithSecret(id : string){
+  async findOneByIdWithSecret(id: string) {
     return this.userRepository
-    .createQueryBuilder('user')
-    .where('user.id = :id' , {id})
-    .addSelect('user.tfa_secret')
-    .getOne()
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .addSelect('user.tfa_secret')
+      .getOne();
   }
-  async findOneByIdWithMasterKey(id : string){
+  async findOneByIdWithMasterKey(id: string) {
     return this.userRepository
-    .createQueryBuilder('user')
-    .where('user.id = :id' , {id})
-    .addSelect('user.master_key')
-    .getOne()
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .addSelect('user.master_key')
+      .getOne();
   }
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return this.userRepository
@@ -73,7 +73,7 @@ export class UserService {
     const user = this.userRepository.create(createGoogleUserDto);
     return this.userRepository.save(user);
   }
-  async changeTfaState(user : User, state: TfaState): Promise<boolean> {
+  async changeTfaState(user: User, state: TfaState): Promise<boolean> {
     if (user.tfa_state === state) {
       switch (state) {
         case TfaState.ENABLED:
@@ -91,7 +91,7 @@ export class UserService {
     return true;
   }
   async findOneById(id: string) {
-    if(!id){
+    if (!id) {
       throw new UnauthorizedException('User not found');
     }
     const user = await this.userRepository.findOne({
@@ -104,36 +104,39 @@ export class UserService {
     }
     return user;
   }
-  async createOrCheckMasterKey(id : string , createOrCheckMasterKeyDto : CreateOrCheckMasterKeyDto) : Promise<{message : string}>{
+  async createOrCheckMasterKey(
+    id: string,
+    createOrCheckMasterKeyDto: CreateOrCheckMasterKeyDto,
+  ): Promise<{ message: string }> {
     const user = await this.findOneByIdWithMasterKey(id);
-    if(!user.master_key){
-      user.master_key = createOrCheckMasterKeyDto.master_key
-      await this.userRepository.save(user)
+    if (!user.master_key) {
+      user.master_key = createOrCheckMasterKeyDto.master_key;
+      await this.userRepository.save(user);
       return {
-        message : 'Master key created',
-      }
+        message: 'Master key created',
+      };
     }
-    if(user.master_key !== createOrCheckMasterKeyDto.master_key){
-      throw new UnauthorizedException('Master key not match')
+    if (user.master_key !== createOrCheckMasterKeyDto.master_key) {
+      throw new UnauthorizedException('Master key not match');
     }
     return {
-      message : 'Master key match'
-    }
+      message: 'Master key match',
+    };
   }
-  async updateAvatar(id : string , avatar : Express.Multer.File){
-    if(!avatar){
-      throw new ConflictException('Avatar is required')
+  async updateAvatar(id: string, avatar: Express.Multer.File) {
+    if (!avatar) {
+      throw new ConflictException('Avatar is required');
     }
     const user = await this.findOneById(id);
-    user.profile_picture = avatar.path
+    user.profile_picture = avatar.path;
     return this.userRepository.save(user);
   }
   update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
-  async changeUserTfaSecret(user : User , newSecret : string | null){
-    user.tfa_secret = newSecret
-    return this.userRepository.save(user)
+  async changeUserTfaSecret(user: User, newSecret: string | null) {
+    user.tfa_secret = newSecret;
+    return this.userRepository.save(user);
   }
   async remove(id: string) {
     const user = await this.findOneById(id);

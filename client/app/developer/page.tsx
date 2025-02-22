@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Github, Linkedin, Mail, Globe } from "lucide-react"
-import { developerData } from "@/constants/developer"
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Github, Linkedin, Mail, Globe } from "lucide-react";
+import { developerData } from "@/constants/developer";
 
 const container = {
   hidden: { opacity: 0 },
@@ -15,42 +21,63 @@ const container = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
 const item = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0 },
-}
+};
 
-const { name, role, description, technologies, projects, socialMedia } = developerData
+const { name, role, description, technologies, projects, socialMedia } =
+  developerData;
 
 export default function DeveloperPage() {
   return (
     <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
         <h1 className="text-3xl font-bold tracking-tight">Developer</h1>
-        <p className="text-muted-foreground">About the developer and project information</p>
+        <p className="text-muted-foreground">
+          About the developer and project information
+        </p>
       </motion.div>
 
-      <motion.div variants={container} initial="hidden" animate="show" className="grid gap-6 md:grid-cols-2">
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="grid gap-6 md:grid-cols-2"
+      >
         <motion.div variants={item} className="md:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-4">
                 <div className="relative h-16 w-16 overflow-hidden rounded-full bg-primary/10">
-                  <img src="/placeholder.svg" alt="Developer" className="object-cover" />
+                  <img
+                    src="/placeholder.svg"
+                    alt="Developer"
+                    className="object-cover"
+                  />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold">{name}</h2>
                   <p className="text-muted-foreground">{role}</p>
                 </div>
               </CardTitle>
-              <CardDescription className="mt-4 text-base">{description}</CardDescription>
+              <CardDescription className="mt-4 text-base">
+                {description}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
                 {technologies.map((tech) => (
-                  <Badge key={tech} variant="secondary" className="bg-primary/10 hover:bg-primary/20 transition-colors">
+                  <Badge
+                    key={tech}
+                    variant="secondary"
+                    className="bg-primary/10 hover:bg-primary/20 transition-colors"
+                  >
                     {tech}
                   </Badge>
                 ))}
@@ -66,15 +93,36 @@ export default function DeveloperPage() {
               <CardDescription>Get in touch or follow my work</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <motion.div className="grid gap-4" variants={container} initial="hidden" animate="show">
+              <motion.div
+                className="grid gap-4"
+                variants={container}
+                initial="hidden"
+                animate="show"
+              >
                 {socialMedia.map((social) => (
                   <motion.div key={social.title} variants={item}>
-                    <Button variant="outline" className="w-full gap-2 justify-start" asChild>
-                      <a href={social.link} target="_blank" rel="noopener noreferrer">
-                        {social.title === "GitHub" && <Github className="h-4 w-4" />}
-                        {social.title === "LinkedIn" && <Linkedin className="h-4 w-4" />}
-                        {social.title === "Portfolio" && <Globe className="h-4 w-4" />}
-                        {social.title === "Email" && <Mail className="h-4 w-4" />}
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 justify-start"
+                      asChild
+                    >
+                      <a
+                        href={social.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {social.title === "GitHub" && (
+                          <Github className="h-4 w-4" />
+                        )}
+                        {social.title === "LinkedIn" && (
+                          <Linkedin className="h-4 w-4" />
+                        )}
+                        {social.title === "Portfolio" && (
+                          <Globe className="h-4 w-4" />
+                        )}
+                        {social.title === "Email" && (
+                          <Mail className="h-4 w-4" />
+                        )}
                         {social.title}
                       </a>
                     </Button>
@@ -98,12 +146,21 @@ export default function DeveloperPage() {
                   variants={item}
                   className="group rounded-lg border p-4 hover:bg-muted/50 transition-colors"
                 >
-                  <a href={project.link} target="_blank" rel="noopener noreferrer" className="block space-y-2">
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block space-y-2"
+                  >
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold group-hover:text-primary transition-colors">{project.title}</h3>
+                      <h3 className="font-semibold group-hover:text-primary transition-colors">
+                        {project.title}
+                      </h3>
                       <Github className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <p className="text-sm text-muted-foreground">{project.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {project.description}
+                    </p>
                   </a>
                 </motion.div>
               ))}
@@ -112,6 +169,5 @@ export default function DeveloperPage() {
         </motion.div>
       </motion.div>
     </div>
-  )
+  );
 }
-

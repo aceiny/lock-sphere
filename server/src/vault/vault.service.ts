@@ -19,17 +19,13 @@ export class VaultService {
     private readonly categoryService: CategoryService,
   ) {}
   async create(userId: string, createVaultDto: CreateVaultDto) {
-    const categories = await this.categoryService.findBulkCategories(
-      userId,
-      createVaultDto.category_ids,
-    );
-    if (categories.length !== createVaultDto.category_ids.length) {
-      throw new NotFoundException('One or more categories not found');
-    }
+    const category = createVaultDto.category
+      ? { id: createVaultDto.category }
+      : null;
     const vault = this.vaultService.create({
-      user: { id: userId },
-      categories,
       ...createVaultDto,
+      user: { id: userId },
+      category,
     });
     return this.vaultService.save(vault);
   }
@@ -43,14 +39,7 @@ export class VaultService {
       where: { user: { id: userId } },
       take: offset,
       skip: (page - 1) * offset,
-      relations: ['categories'],
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        website_name: true,
-        website_url: true,
-      },
+      relations: ['category'],
     });
     return {
       data: vaults,
@@ -67,7 +56,7 @@ export class VaultService {
         id,
         user: { id: userId },
       },
-      relations: populate ? ['categories'] : [],
+      relations: populate ? ['category'] : [],
     });
     if (!vault) {
       throw new NotFoundException('Vault not found');
@@ -92,7 +81,7 @@ export class VaultService {
 
     const categoryExists = await this.vaultService
       .createQueryBuilder()
-      .relation(Vault, 'categories')
+      .relation(Vault, 'category')
       .of(vault)
       .loadMany();
 
@@ -102,7 +91,7 @@ export class VaultService {
 
     await this.vaultService
       .createQueryBuilder()
-      .relation(Vault, 'categories')
+      .relation(Vault, 'category')
       .of(vault)
       .add(category);
 
@@ -132,20 +121,20 @@ export class VaultService {
       throw new NotFoundException('Vault or Category not found');
     }
 
-    const existingCategories = await this.vaultService
+    const existingcategory = await this.vaultService
       .createQueryBuilder()
-      .relation(Vault, 'categories')
+      .relation(Vault, 'category')
       .of(vault)
       .loadMany();
 
-    if (!existingCategories.some((cat) => cat.id === category.id)) {
+    if (!existingcategory.some((cat) => cat.id === category.id)) {
       throw new ConflictException('Category is not assigned to this vault');
     }
 
     // Remove category from the vault
     await this.vaultService
       .createQueryBuilder()
-      .relation(Vault, 'categories')
+      .relation(Vault, 'category')
       .of(vault)
       .remove(category);
 

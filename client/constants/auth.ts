@@ -15,5 +15,4 @@ export const authData = {
     title: "Check Your Email",
     description: "We've sent a verification code to your email address",
   },
-}
-
+};

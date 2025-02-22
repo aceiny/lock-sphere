@@ -1,18 +1,28 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import ThemeToggler from "@/components/theme-toggler"
-import { Shield, ArrowRight, Check, Lock, Users, Globe, Star, Zap, Gift } from "lucide-react"
-import { landingData } from "@/constants/landing"
-import { layoutData } from "@/constants/layout"
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import ThemeToggler from "@/components/theme-toggler";
+import {
+  Shield,
+  ArrowRight,
+  Check,
+  Lock,
+  Users,
+  Globe,
+  Star,
+  Zap,
+  Gift,
+} from "lucide-react";
+import { landingData } from "@/constants/landing";
+import { layoutData } from "@/constants/layout";
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
   transition: { duration: 0.5 },
-}
+};
 
 const stagger = {
   animate: {
@@ -20,7 +30,7 @@ const stagger = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
 export default function HomePage() {
   return (
@@ -82,7 +92,9 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-background to-blue-500/5" />
           <div className="container px-4 md:px-6 relative">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Why Choose LockSphere?</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                Why Choose LockSphere?
+              </h2>
               <p className="mt-4 text-muted-foreground text-lg">
                 Industry-leading security features to protect your digital life
               </p>
@@ -103,7 +115,9 @@ export default function HomePage() {
                       <feature.icon className="h-8 w-8 text-primary" />
                     </div>
                     <h3 className="text-xl font-semibold">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
+                    <p className="text-muted-foreground">
+                      {feature.description}
+                    </p>
                   </div>
                 </motion.div>
               ))}
@@ -122,9 +136,12 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 className="space-y-4"
               >
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Enterprise-Grade Security</h2>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+                  Enterprise-Grade Security
+                </h2>
                 <p className="text-muted-foreground text-lg">
-                  Our zero-knowledge architecture ensures that your data remains encrypted and secure at all times.
+                  Our zero-knowledge architecture ensures that your data remains
+                  encrypted and secure at all times.
                 </p>
                 <ul className="space-y-3">
                   {[
@@ -167,7 +184,9 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-tl from-purple-500/5 via-background to-blue-500/5" />
           <div className="container px-4 md:px-6 relative">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Trusted by Thousands</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+                Trusted by Thousands
+              </h2>
               <p className="mt-4 text-muted-foreground text-lg">
                 Join our growing community of security-conscious users
               </p>
@@ -203,8 +222,12 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-dot-pattern opacity-5" />
           <div className="container px-4 md:px-6 relative">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Ready to Get Started?</h2>
-              <p className="mt-4 text-muted-foreground text-lg">Join thousands of users who trust LockSphere</p>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+                Ready to Get Started?
+              </h2>
+              <p className="mt-4 text-muted-foreground text-lg">
+                Join thousands of users who trust LockSphere
+              </p>
             </div>
             <div className="grid gap-8 md:grid-cols-3">
               {[
@@ -212,19 +235,31 @@ export default function HomePage() {
                   icon: Zap,
                   title: "Free",
                   price: "$0",
-                  features: ["Basic password storage", "Secure notes", "2FA support"],
+                  features: [
+                    "Basic password storage",
+                    "Secure notes",
+                    "2FA support",
+                  ],
                 },
                 {
                   icon: Star,
                   title: "Pro",
                   price: "$4.99",
-                  features: ["Everything in Free", "Advanced security", "Priority support"],
+                  features: [
+                    "Everything in Free",
+                    "Advanced security",
+                    "Priority support",
+                  ],
                 },
                 {
                   icon: Gift,
                   title: "Enterprise",
                   price: "Custom",
-                  features: ["Everything in Pro", "Team management", "Custom features"],
+                  features: [
+                    "Everything in Pro",
+                    "Team management",
+                    "Custom features",
+                  ],
                 },
               ].map((plan, index) => (
                 <motion.div
@@ -242,7 +277,10 @@ export default function HomePage() {
                     <div className="text-3xl font-bold">{plan.price}</div>
                     <ul className="space-y-2">
                       {plan.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="flex items-center gap-2 text-sm">
+                        <li
+                          key={featureIndex}
+                          className="flex items-center gap-2 text-sm"
+                        >
                           <Check className="h-4 w-4 text-green-500" />
                           <span>{feature}</span>
                         </li>
@@ -260,10 +298,16 @@ export default function HomePage() {
       </main>
       <footer className="border-t py-6 md:py-0">
         <div className="container flex flex-col gap-4 md:h-24 md:flex-row md:items-center">
-          <p className="text-sm text-muted-foreground">{layoutData.footer.copyright}</p>
+          <p className="text-sm text-muted-foreground">
+            {layoutData.footer.copyright}
+          </p>
           <nav className="md:ml-auto flex gap-4 sm:gap-6">
             {layoutData.footer.links.map((link) => (
-              <Link key={link.href} href={link.href} className="text-sm text-muted-foreground hover:underline">
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm text-muted-foreground hover:underline"
+              >
                 {link.label}
               </Link>
             ))}
@@ -271,6 +315,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
-

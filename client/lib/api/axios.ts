@@ -1,9 +1,9 @@
-import axios from "axios"
+import axios from "axios";
 
 export interface ResponseInterface<T> {
-  message : string,
-  stats : number,
-  data : T
+  message: string;
+  stats: number;
+  data: T;
 }
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -11,30 +11,29 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
   validateStatus: (status: number) => status === 200 || status === 201,
-  withCredentials:true
-}) 
+  withCredentials: true,
+});
 
 // Add a request interceptor
 api.interceptors.request.use(
   (config) => {
-    return config
+    return config;
   },
   (error) => {
-    return Promise.reject(error)
+    return Promise.reject(error);
   },
-)
+);
 
 // Add a response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if(error.response?.data?.message == "Tfa required"){
-      sessionStorage.setItem("tfa-challange", error.response?.data?.challange)
-      window.location.replace('/verify-mfa')
+    if (error.response?.data?.message == "Tfa required") {
+      sessionStorage.setItem("tfa-challange", error.response?.data?.challange);
+      window.location.replace("/verify-mfa");
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   },
-)
+);
 
-export default api
-
+export default api;

@@ -21,7 +21,7 @@ export function Navbar() {
   const [showLogoutDialog, setShowLogoutDialog] = React.useState(false);
 
   const { data: user } = useUser();
-  // user data 
+  // user data
   return (
     <div className="h-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-full items-center gap-4 px-4 sm:gap-8">
@@ -77,16 +77,24 @@ export function Navbar() {
                   )}
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-medium">{user?.name || layoutData.user.name}</span>
-                  <span className="text-sm text-muted-foreground">{user?.email || layoutData.user.email}</span>
+                  <span className="font-medium">
+                    {user?.name || layoutData.user.name}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {user?.email || layoutData.user.email}
+                  </span>
                 </div>
               </div>
               <div className="mt-2 space-y-1">
-                <DropdownMenuItem onClick={() => router.push("/settings?section=profile")}>
+                <DropdownMenuItem
+                  onClick={() => router.push("/settings?section=profile")}
+                >
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/settings?section=security")}>
+                <DropdownMenuItem
+                  onClick={() => router.push("/settings?section=security")}
+                >
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Security Settings</span>
                 </DropdownMenuItem>
@@ -104,7 +112,10 @@ export function Navbar() {
         </div>
       </div>
 
-      <LogoutDialog showLogoutDialog={showLogoutDialog} setShowLogoutDialog={setShowLogoutDialog} />
+      <LogoutDialog
+        showLogoutDialog={showLogoutDialog}
+        setShowLogoutDialog={setShowLogoutDialog}
+      />
     </div>
   );
 }

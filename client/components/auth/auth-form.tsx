@@ -1,57 +1,68 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { Eye, EyeOff, KeyRound, Mail, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useSignin, useSignup } from "@/lib/api/auth"
+import * as React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, KeyRound, Mail, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useSignin, useSignup } from "@/lib/api/auth";
 
 interface AuthFormProps {
-  mode: "login" | "register"
+  mode: "login" | "register";
 }
 
 export function AuthForm({ mode }: AuthFormProps) {
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [loading, setLoading] = React.useState(false)
-  const router = useRouter()
-  const { mutate: mutateSignin, isPending: isSigningIn } = useSignin()
-  const { mutate: mutateSignup, isPending: isSigningUp } = useSignup()
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const router = useRouter();
+  const { mutate: mutateSignin, isPending: isSigningIn } = useSignin();
+  const { mutate: mutateSignup, isPending: isSigningUp } = useSignup();
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    const formData = new FormData(e.currentTarget as HTMLFormElement)
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const name = formData.get('name') as string
+    e.preventDefault();
+    setLoading(true);
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const name = formData.get("name") as string;
     switch (mode) {
       case "login":
-        mutateSignin({email, password})
-        break
+        mutateSignin({ email, password });
+        break;
       case "register":
-        mutateSignup({email, password , name})
-        break
-
+        mutateSignup({ email, password, name });
+        break;
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const handleGoogleSignIn = () => {
-    
-    setLoading(true)
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`
-  }
+    setLoading(true);
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+  };
 
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>{mode === "login" ? "Welcome back" : "Create account"}</CardTitle>
+          <CardTitle>
+            {mode === "login" ? "Welcome back" : "Create account"}
+          </CardTitle>
           <CardDescription>
             {mode === "login"
               ? "Enter your credentials to access your vault"
@@ -60,27 +71,47 @@ export function AuthForm({ mode }: AuthFormProps) {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-          {mode === "register" && (
-            <div className="space-y-2">
-              <Label htmlFor="email">Name</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                <Input id="name" name="name" type="name" placeholder="jhon doe" className="pl-10" required />
+            {mode === "register" && (
+              <div className="space-y-2">
+                <Label htmlFor="email">Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="name"
+                    name="name"
+                    type="name"
+                    placeholder="jhon doe"
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
-            </div>
             )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                <Input id="email" name="email" type="email" placeholder="name@example.com" className="pl-10" required />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  className="pl-10"
+                  required
+                />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <KeyRound className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                <Input id="password" name="password" type={showPassword ? "text" : "password"} className="pl-10 pr-10" required />
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  className="pl-10 pr-10"
+                  required
+                />
                 <Button
                   type="button"
                   variant="ghost"
@@ -93,7 +124,9 @@ export function AuthForm({ mode }: AuthFormProps) {
                   ) : (
                     <Eye className="h-5 w-5 text-muted-foreground" />
                   )}
-                  <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                  <span className="sr-only">
+                    {showPassword ? "Hide password" : "Show password"}
+                  </span>
                 </Button>
               </div>
             </div>
@@ -112,7 +145,13 @@ export function AuthForm({ mode }: AuthFormProps) {
               )}
             </Button>
             <Separator className="my-4" />
-            <Button type="button" variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+            >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -137,14 +176,20 @@ export function AuthForm({ mode }: AuthFormProps) {
               {mode === "login" ? (
                 <>
                   Don't have an account?{" "}
-                  <Link href="/register" className="underline hover:text-foreground">
+                  <Link
+                    href="/register"
+                    className="underline hover:text-foreground"
+                  >
                     Sign up
                   </Link>
                 </>
               ) : (
                 <>
                   Already have an account?{" "}
-                  <Link href="/login" className="underline hover:text-foreground">
+                  <Link
+                    href="/login"
+                    className="underline hover:text-foreground"
+                  >
                     Sign in
                   </Link>
                 </>
@@ -154,6 +199,5 @@ export function AuthForm({ mode }: AuthFormProps) {
         </form>
       </Card>
     </motion.div>
-  )
+  );
 }
-

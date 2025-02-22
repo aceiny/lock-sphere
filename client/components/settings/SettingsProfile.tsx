@@ -2,7 +2,13 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
@@ -33,7 +39,9 @@ const SettingsProfile: React.FC = () => {
     }
   }, [user]);
 
-  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -43,23 +51,24 @@ const SettingsProfile: React.FC = () => {
     const formDataToUpload = new FormData();
     formDataToUpload.append("avatar", file);
 
-    mutateProfilePicture({
-      formData: formDataToUpload,
-      options: {
-        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-          if (progressEvent.total) {
-            setUploadProgress(Math.round((progressEvent.loaded / progressEvent.total) * 100));
-          }
+    mutateProfilePicture(
+      {
+        formData: formDataToUpload,
+        options: {
+          onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+            if (progressEvent.total) {
+              setUploadProgress(
+                Math.round((progressEvent.loaded / progressEvent.total) * 100),
+              );
+            }
+          },
         },
       },
-    } , {
-      onSuccess(){
-
+      {
+        onSuccess() {},
+        onError() {},
       },
-      onError(){
-
-      }
-    });
+    );
     setIsUploading(false);
     setUploadProgress(0);
   };
@@ -85,11 +94,18 @@ const SettingsProfile: React.FC = () => {
 
   return (
     <div>
-      <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 20 }}
+        transition={{ duration: 0.2 }}
+      >
         <Card className="border">
           <CardHeader>
             <CardTitle>Profile Information</CardTitle>
-            <CardDescription>Update your personal information and avatar</CardDescription>
+            <CardDescription>
+              Update your personal information and avatar
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center gap-6">
@@ -105,21 +121,42 @@ const SettingsProfile: React.FC = () => {
                     quality={90}
                   />
                 </div>
-                <Button size="icon" variant="outline" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
                   <Upload className="h-4 w-4" />
                 </Button>
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={isUploading} />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                  disabled={isUploading}
+                />
               </div>
               <div className="flex-1 space-y-1">
                 <h3 className="font-medium">Profile Picture</h3>
-                <p className="text-sm text-muted-foreground">Upload a new avatar</p>
-                <Button size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                <p className="text-sm text-muted-foreground">
+                  Upload a new avatar
+                </p>
+                <Button
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
                   {isUploading ? "Uploading..." : "Upload New"}
                 </Button>
                 {isUploading && (
                   <div className="mt-2 space-y-2">
                     <Progress value={uploadProgress} className="h-2 w-full" />
-                    <p className="text-sm text-muted-foreground">{uploadProgress}% uploaded</p>
+                    <p className="text-sm text-muted-foreground">
+                      {uploadProgress}% uploaded
+                    </p>
                   </div>
                 )}
               </div>
@@ -127,11 +164,20 @@ const SettingsProfile: React.FC = () => {
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" value={formData.name} onChange={(e) => handleInputChange("name", e.target.value)} />
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} />
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                />
               </div>
               <Button disabled={loading || isUploading} onClick={handleSave}>
                 {loading ? "Saving..." : "Save Changes"}

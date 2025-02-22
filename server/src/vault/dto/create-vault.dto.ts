@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsUrl,
-  IsArray,
   IsUUID,
 } from 'class-validator';
 
@@ -26,7 +25,6 @@ export class CreateVaultDto {
   website_url?: string;
 
   @IsOptional()
-  @IsArray()
-  @IsUUID('4', { each: true })
-  category_ids?: string[];
+  @IsUUID('4')
+  category?: string;
 }

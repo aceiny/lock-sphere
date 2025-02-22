@@ -1,20 +1,30 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Shield, ArrowRight } from "lucide-react"
-import ThemeToggler from "@/components/theme-toggler"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Shield, ArrowRight } from "lucide-react";
+import ThemeToggler from "@/components/theme-toggler";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function SetupMFAPage() {
   return (
     <div className="min-h-screen w-full py-12 md:py-24 lg:py-32 bg-gradient-to-br from-background via-muted/50 to-background">
       <div className="absolute right-4 top-4 flex items-center gap-2">
-        <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          href="/"
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
           Back to home
         </Link>
         <ThemeToggler />
@@ -27,7 +37,9 @@ export default function SetupMFAPage() {
       >
         <div className="flex flex-col items-center space-y-2 text-center">
           <Shield className="h-12 w-12 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Setup Two-Factor Auth</h1>
+          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            Setup Two-Factor Auth
+          </h1>
           <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed">
             Add an extra layer of security to your account
           </p>
@@ -35,19 +47,25 @@ export default function SetupMFAPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Choose Authentication Method</CardTitle>
-            <CardDescription>Select how you want to receive authentication codes</CardDescription>
+            <CardDescription>
+              Select how you want to receive authentication codes
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="authenticator" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="authenticator">Authenticator App</TabsTrigger>
+                <TabsTrigger value="authenticator">
+                  Authenticator App
+                </TabsTrigger>
                 <TabsTrigger value="sms">SMS</TabsTrigger>
               </TabsList>
               <TabsContent value="authenticator" className="space-y-4">
                 <div className="flex justify-center py-4">
                   <div className="w-48 h-48 bg-muted flex items-center justify-center">
                     {/* This would be replaced with an actual QR code */}
-                    <div className="text-center text-muted-foreground">QR Code</div>
+                    <div className="text-center text-muted-foreground">
+                      QR Code
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -55,7 +73,8 @@ export default function SetupMFAPage() {
                   <Input type="text" placeholder="Enter 6-digit code" />
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  1. Install an authenticator app like Google Authenticator or Authy
+                  1. Install an authenticator app like Google Authenticator or
+                  Authy
                   <br />
                   2. Scan the QR code or enter the setup key manually
                   <br />
@@ -86,6 +105,5 @@ export default function SetupMFAPage() {
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }
-

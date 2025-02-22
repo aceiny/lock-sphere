@@ -1,20 +1,25 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Pencil, X } from "lucide-react"
-import { CategoryDialog } from "./category-dialog"
+import * as React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Pencil, X } from "lucide-react";
+import { CategoryDialog } from "./category-dialog";
 
 interface CategoryBadgeProps {
-  category: string
-  onEdit?: (category: string) => void
-  onDelete?: (category: string) => void
-  editable?: boolean
+  category: string;
+  onEdit?: (category: string) => void;
+  onDelete?: (category: string) => void;
+  editable?: boolean;
 }
 
-export function CategoryBadge({ category, onEdit, onDelete, editable = true }: CategoryBadgeProps) {
-  const [showEditDialog, setShowEditDialog] = React.useState(false)
+export function CategoryBadge({
+  category,
+  onEdit,
+  onDelete,
+  editable = true,
+}: CategoryBadgeProps) {
+  const [showEditDialog, setShowEditDialog] = React.useState(false);
 
   return (
     <>
@@ -30,8 +35,8 @@ export function CategoryBadge({ category, onEdit, onDelete, editable = true }: C
               size="icon"
               className="h-4 w-4 hover:bg-transparent"
               onClick={(e) => {
-                e.stopPropagation()
-                setShowEditDialog(true)
+                e.stopPropagation();
+                setShowEditDialog(true);
               }}
             >
               <Pencil className="h-3 w-3" />
@@ -42,8 +47,8 @@ export function CategoryBadge({ category, onEdit, onDelete, editable = true }: C
               size="icon"
               className="h-4 w-4 hover:bg-transparent text-red-500 hover:text-red-600"
               onClick={(e) => {
-                e.stopPropagation()
-                onDelete?.(category)
+                e.stopPropagation();
+                onDelete?.(category);
               }}
             >
               <X className="h-3 w-3" />
@@ -53,8 +58,12 @@ export function CategoryBadge({ category, onEdit, onDelete, editable = true }: C
         )}
       </Badge>
 
-      <CategoryDialog open={showEditDialog} onOpenChange={setShowEditDialog} mode="edit" initialCategory={category} />
+      <CategoryDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        mode="edit"
+        initialCategory={category}
+      />
     </>
-  )
+  );
 }
-

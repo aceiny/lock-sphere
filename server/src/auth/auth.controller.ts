@@ -24,7 +24,7 @@ import { getEnvOrFatal } from 'common/utils/env.util';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  private readonly FRONTEND_URL = getEnvOrFatal('FRONTEND_URL')
+  private readonly FRONTEND_URL = getEnvOrFatal('FRONTEND_URL');
   constructor(private readonly authService: AuthService) {}
 
   @Get('google')
@@ -35,11 +35,15 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  async googleAuthRedirect(@GetUser() user : SessionInterface , @Req() req: Request , @Res({passthrough : true}) res: Response) : Promise<void> {
+  async googleAuthRedirect(
+    @GetUser() user: SessionInterface,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
     if (!user || !user.id) {
       throw new UnauthorizedException('Google authentication failed');
     }
-    await this.authService.signSession(req , user)
+    await this.authService.signSession(req, user);
     return res.redirect(`${this.FRONTEND_URL}/auth/loading`);
   }
 
@@ -48,11 +52,11 @@ export class AuthController {
   })
   @Post('signup')
   async signup(
-    @Req() req : Request,
+    @Req() req: Request,
     @Body() createUserDto: CreateUserDto,
   ): Promise<ResponseInterface<null>> {
     const user = await this.authService.signup(createUserDto);
-    await this.authService.signSession(req,user)
+    await this.authService.signSession(req, user);
     return {
       message: 'Signup succesfully',
       status: HttpStatus.CREATED,
@@ -86,8 +90,11 @@ export class AuthController {
     summary: 'Signout a user',
   })
   @Post('/signout')
-  async signout(@Req() req: Request , @Res({passthrough : true}) res : Response): Promise<ResponseInterface<null>> {
-    const data = await this.authService.signout(req , res);
+  async signout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<ResponseInterface<null>> {
+    const data = await this.authService.signout(req, res);
     return {
       message: 'Logout succesfully',
       status: HttpStatus.OK,
@@ -100,25 +107,27 @@ export class AuthController {
   @Post('/verify-tfa')
   async verifyTfa(
     @Body() verifyTfaDto: VerifyTfaDto,
-    @Req() req : Request,
+    @Req() req: Request,
   ): Promise<ResponseInterface<null>> {
     const user = await this.authService.verifyTfa(verifyTfaDto);
-    await this.authService.signSession(req , user)
+    await this.authService.signSession(req, user);
     return {
-      message : "TFA was succesfully verfied",
-      status : HttpStatus.ACCEPTED
-    }
+      message: 'TFA was succesfully verfied',
+      status: HttpStatus.ACCEPTED,
+    };
   }
 
   @ApiOperation({
     summary: 'validate the session',
   })
   @Get('validate-session')
-  async validateSession(@GetUser() user: SessionInterface): Promise<ResponseInterface<null>> {
-    if(!user || !user.id) {
+  async validateSession(
+    @GetUser() user: SessionInterface,
+  ): Promise<ResponseInterface<null>> {
+    if (!user || !user.id) {
       throw new UnauthorizedException('Invalid session');
     }
-    await this.authService.checkUserValid(user.id)
+    await this.authService.checkUserValid(user.id);
     return {
       message: 'Session is valid',
       status: HttpStatus.OK,
