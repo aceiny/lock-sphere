@@ -2,10 +2,46 @@
 
 ## Table of Contents
 
+- [About](#about)
+- [Database Schema](#database-schema)
+- [API Documentation](#api-documentation)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Cloning](#cloning)
+  - [Quick Start 🚀](#quick-start-🚀)
+    - [Server](#server)
+    - [Client](#client)
+- [Environment Variables](#environment-variables)
+- [Running the App](#running-the-app)
+- [Project Structure](#project-structure)
+  - [Backend Structure](#backend-structure-server)
+  - [Client Structure](#client-structure-client)
+- [Features](#features)
+  - [Vault Management](#vault-management)
+  - [File Handling](#file-handling)
+  - [Email System](#email-system)
+  - [Security Measures](#security-measures)
+  - [User Interface](#user-interface)
+  - [Data Management](#data-management)
+  - [Other Features](#other-features)
+- [Technologies Used 🛠️](#technologies-used-🛠️)
+  - [Core Framework](#core-framework)
+  - [Database & Storage](#database--storage)
+  - [Authentication & Security](#authentication--security)
+  - [Real-time & Communication](#real-time--communication)
+  - [Validation & Documentation](#validation--documentation)
+  - [Development Tools](#development-tools)
+  - [Testing](#testing)
+  - [UI and Styling](#ui-and-styling)
+- [Contributing](#contributing)
+- [Deployment](#deployment)
+- [License](#license)
+- [Contributors](#contributors)
+
 
 ## About
 
-LockSphere is a robust password management solution designed to securely store and manage your sensitive credentials. Built with NestJS and other modern technologies, LockSphere ensures your data remains protected while providing easy access when you need it.
+LockSphere is a robust password management solution designed to securely store and manage your sensitive credentials. Built with NestJS and modern encryptions technologies, LockSphere ensures your data remains protected while providing easy access when you need it.
 
 ## Database schema
 
@@ -17,7 +53,7 @@ https://drawsql.app/teams/aceiny/diagrams/lock-sphere
 
 ```bash
 # API documentation is auto-generated using Swagger and can be accessed at:
-/api/docs
+/docs
 ```
 
 ## Getting Started
@@ -60,12 +96,12 @@ $ npm run dev
 
 #### Server Environment Variables  
 ```bash  
-$(cat backend/.env.development)
-```
+$(cat server/.env.development)
+
 #### Client Environment Variables
 ```bash  
-$(cat backend/.env.development)
-```
+$(cat client/.env.development)
+
 
 ### Running the app
 
