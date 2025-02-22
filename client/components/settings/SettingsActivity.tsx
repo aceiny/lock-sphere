@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { useAuthLogs } from "@/lib/api/auth";
+import { format } from 'date-fns';
 
 export default function SettingsActivity() {
   const { data } = useAuthLogs();
@@ -44,13 +45,14 @@ export default function SettingsActivity() {
                 <TableHead>Device</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>IP Address</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loginHistory.map((log, index) => (
                 <TableRow key={index}>
-                  <TableCell>{log.loggedAt}</TableCell>
+                  <TableCell>{format(new Date(log.loggedAt), 'PPpp')}</TableCell>
                   <TableCell>{log.user_agent}</TableCell>
                   <TableCell>{log.location}</TableCell>
                   <TableCell>
@@ -62,6 +64,7 @@ export default function SettingsActivity() {
                       {log.status.toLowerCase()}
                     </Badge>
                   </TableCell>
+                  <TableCell>{log.source}</TableCell>
                   <TableCell className="font-mono">{log.ip_address}</TableCell>
                 </TableRow>
               ))}

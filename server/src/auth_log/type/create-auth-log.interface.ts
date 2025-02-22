@@ -1,3 +1,4 @@
+import { AuthLogSourceEnum } from './auth-log.source.enum';
 import { AuthLogStatusEnum } from './auth-log.status.enum';
 
 export interface CreateAuthLogInterface {
@@ -6,4 +7,5 @@ export interface CreateAuthLogInterface {
   status: AuthLogStatusEnum;
   reason?: string;
   location?: string;
+  source : AuthLogSourceEnum
 }

@@ -2,6 +2,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthLogStatusEnum } from '../type/auth-log.status.enum';
+import { AuthLogSourceEnum } from '../type/auth-log.source.enum';
 
 @Entity()
 export class AuthLog {
@@ -24,8 +25,8 @@ export class AuthLog {
   })
   status: AuthLogStatusEnum;
 
-  @Column({ type: 'text', nullable: true })
-  reason?: string;
+  @Column({ type: 'enum', enum : AuthLogSourceEnum , default : AuthLogSourceEnum.LOGIN  , nullable: false })
+  source : AuthLogSourceEnum;
 
   @Column({ default: 'Unknown' })
   location?: string;

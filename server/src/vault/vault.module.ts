@@ -10,6 +10,7 @@ import { CategoryModule } from 'src/category/category.module';
   imports: [TypeOrmModule.forFeature([Vault]), CategoryModule],
   controllers: [VaultController],
   providers: [VaultService],
+  exports: [VaultService],
 })
 export class VaultModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

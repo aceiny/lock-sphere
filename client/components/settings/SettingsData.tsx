@@ -1,4 +1,5 @@
 "use client";
+
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,27 +11,31 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Download, LogOut, Database } from "lucide-react";
-import React from "react";
-import { useSignout } from "@/lib/api/auth";
+import React, { useState } from "react";
 import ExportDataDialog from "./ExportDataDialog";
 import LogoutDialog from "./LogoutDialog";
+import { useExportDataBackup } from "@/lib/api/data";
+import { showErrorToast, showSuccessToast } from "../utils/toast-handler";
 
 const SettingsData = () => {
-  const [showLogoutDialog, setShowLogoutDialog] = React.useState(false);
-  const exportVault = {
-    mutateAsync: async () => {
-      console.log("Export vault - to be implemented");
-    },
+  const { mutate: mutateExportData, isPending } = useExportDataBackup();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+
+  const handleExport = () => {
+    mutateExportData(undefined, {
+      onSuccess: () => {
+        setShowExportDialog(false);
+        showSuccessToast("Data export started.");
+      },
+      onError: (error: any) => {
+        showErrorToast(
+          error?.response?.data?.message || "Failed to export data. Try again."
+        );
+      },
+    });
   };
-  const [showExportDialog, setShowExportDialog] = React.useState(false);
-  const handleExport = async () => {
-    try {
-      await exportVault.mutateAsync();
-      setShowExportDialog(false);
-    } catch (error) {
-      console.error("Export failed:", error);
-    }
-  };
+
   return (
     <>
       <motion.div
@@ -61,9 +66,10 @@ const SettingsData = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowExportDialog(true)}
+                disabled={isPending}
               >
                 <Download className="mr-2 h-4 w-4" />
-                Export
+                {isPending ? "Exporting..." : "Export"}
               </Button>
             </div>
             <div className="flex items-center justify-between">
@@ -87,6 +93,7 @@ const SettingsData = () => {
           </CardContent>
         </Card>
       </motion.div>
+
       <ExportDataDialog
         showExportDialog={showExportDialog}
         setShowExportDialog={setShowExportDialog}

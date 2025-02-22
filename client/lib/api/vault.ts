@@ -124,25 +124,3 @@ export function useRemoveCategoryFromVault() {
   });
 }
 
-// Add this export function:
-export function useExportVault() {
-  return useMutation({
-    mutationFn: async () => {
-      const response = await axios.get("/vault/export", {
-        responseType: "blob",
-      });
-      // Create blob link to download
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `vault-export-${new Date().toISOString()}.json`,
-      );
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    },
-  });
-}

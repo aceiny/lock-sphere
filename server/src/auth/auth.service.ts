@@ -23,6 +23,7 @@ import * as geoip from 'geoip-lite';
 import { TfaAuthentificationService } from 'src/user/tfa-authentification.service';
 import { VerifyTfaDto } from 'src/user/types/verify-tfa.dto';
 import { TfaState } from 'src/user/types/tfa-state.enum';
+import { AuthLogSourceEnum } from 'src/auth_log/type/auth-log.source.enum';
 @Injectable()
 export class AuthService {
   constructor(
@@ -64,10 +65,12 @@ export class AuthService {
     };
   }
   async validateUserWithGoogle(
+    req : Request,
     user: createGoogleUserDto,
   ): Promise<SessionInterface> {
     const existingUser = await this.userService.findByEmail(user.email);
     if (existingUser) {
+      await this.authLogService.createAuthLog(req , existingUser.id , AuthLogSourceEnum.GOOGLE);
       return {
         id: existingUser.id,
         email: existingUser.email,
@@ -75,38 +78,34 @@ export class AuthService {
       };
     }
     const new_user = await this.userService.createWithGoogle(user);
+    await this.authLogService.createAuthLog(req , new_user.id , AuthLogSourceEnum.GOOGLE);
     return {
       id: new_user.id,
       email: new_user.email,
       name: new_user.name,
     };
   }
-  async verifyTfa(verifyTfaDto: VerifyTfaDto): Promise<SessionInterface> {
-    const user =
-      await this.tfaAuthentificationService.verifyTfaToken(verifyTfaDto);
+  async verifyTfa(req : Request , verifyTfaDto: VerifyTfaDto): Promise<SessionInterface> {
+    const user = await this.tfaAuthentificationService.verifyTfaToken(verifyTfaDto);
+    await this.authLogService.createAuthLog(req , user.id , AuthLogSourceEnum.TFA);
     return user;
   }
   async signin(req: Request, user: SessionInterface): Promise<any> {
-    const mailDto: SendEmailOptions = {
-      to: user.email,
-      subject: 'New login to your lock sphere account',
-    };
-    const location = geoip.lookup(req.ip);
-    Logger.log(location);
-    await this.authLogService.createAuthLog(user.id, {
-      ip_address: req.ip,
-      user_agent: req.headers['user-agent'] || 'Unknown',
-      status: AuthLogStatusEnum.SUCCESS,
-    });
-    /*await this.emailQueue.add(
-      "new-login",
-      { mailDto },
-      { attempts: 3, backoff: { type: "exponential", delay: 1000 } },
-      );*/
+    await this.authLogService.createAuthLog(req , user.id , AuthLogSourceEnum.LOGIN);
     return true;
+    /*await this.emailQueue.add(
+      const mailDto: SendEmailOptions = {
+        to: user.email,
+        subject: 'New login to your lock sphere account',
+        };
+        "new-login",
+        { mailDto },
+        { attempts: 3, backoff: { type: "exponential", delay: 1000 } },
+        );*/
   }
-  async signup(createUserDto: CreateUserDto): Promise<any> {
+  async signup(req : Request , createUserDto: CreateUserDto): Promise<any> {
     const user = await this.userService.create(createUserDto);
+    await this.authLogService.createAuthLog(req , user.id , AuthLogSourceEnum.REGISTER);
     return {
       id: user.id,
       email: user.email,

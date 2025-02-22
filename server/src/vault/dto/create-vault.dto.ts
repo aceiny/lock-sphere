@@ -21,7 +21,7 @@ export class CreateVaultDto {
 
   @IsString()
   @IsUrl()
-  @IsOptional()
+  @IsOptional()w
   website_url?: string;
 
   @IsOptional()

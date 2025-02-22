@@ -14,11 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { PasswordDialog } from "@/components/password/password-dialogs";
 import { DeleteConfirmationDialog } from "../utils/delete-confarmation-dialog";
 import { PasswordCardActions } from "./password-card-actions";
-
+import { format } from 'date-fns';
 interface PasswordCardProps {
   website_name: string;
   identifier: string;
-  lastUpdated: string;
+  createdAt: string;
   category?: string;
   encrypted_payload: string;
   website_url?: string;
@@ -27,7 +27,7 @@ interface PasswordCardProps {
 export function PasswordCard({
   website_name,
   identifier,
-  lastUpdated,
+  createdAt,
   category = "Other",
   encrypted_payload,
   website_url,
@@ -129,7 +129,7 @@ export function PasswordCard({
           </CardContent>
           <CardFooter className="flex justify-between">
             <div className="text-xs text-muted-foreground">
-              Updated {lastUpdated}
+              Created {format(new Date(createdAt), 'PPpp')}
             </div>
             <Button
               variant="ghost"

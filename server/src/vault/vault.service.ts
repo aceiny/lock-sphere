@@ -15,19 +15,19 @@ import { CategoryService } from 'src/category/category.service';
 export class VaultService {
   constructor(
     @InjectRepository(Vault)
-    private readonly vaultService: Repository<Vault>,
+    private readonly vaultRepository: Repository<Vault>,
     private readonly categoryService: CategoryService,
   ) {}
   async create(userId: string, createVaultDto: CreateVaultDto) {
     const category = createVaultDto.category
       ? { id: createVaultDto.category }
       : null;
-    const vault = this.vaultService.create({
+    const vault = this.vaultRepository.create({
       ...createVaultDto,
       user: { id: userId },
       category,
     });
-    return this.vaultService.save(vault);
+    return this.vaultRepository.save(vault);
   }
 
   async findAllVaultsByUserPaginated(
@@ -35,7 +35,7 @@ export class VaultService {
     page: number,
     offset: number,
   ): Promise<PaginatedResponse<Vault>> {
-    const [vaults, total] = await this.vaultService.findAndCount({
+    const [vaults, total] = await this.vaultRepository.findAndCount({
       where: { user: { id: userId } },
       take: offset,
       skip: (page - 1) * offset,
@@ -49,9 +49,16 @@ export class VaultService {
       totalPages: Math.ceil(total / offset),
     };
   }
+  async findAllByUserId(userId: string) {
+    return this.vaultRepository.find({
+      where : {
+        user : {id : userId},
+      }
+    })
+  }
 
   async findOneVault(userId: string, id: string, populate: boolean = true) {
-    const vault = await this.vaultService.findOne({
+    const vault = await this.vaultRepository.findOne({
       where: {
         id,
         user: { id: userId },
@@ -79,7 +86,7 @@ export class VaultService {
       throw new NotFoundException('Vault or Category not found');
     }
 
-    const categoryExists = await this.vaultService
+    const categoryExists = await this.vaultRepository
       .createQueryBuilder()
       .relation(Vault, 'category')
       .of(vault)
@@ -89,7 +96,7 @@ export class VaultService {
       throw new ConflictException('Category is already assigned to this vault');
     }
 
-    await this.vaultService
+    await this.vaultRepository
       .createQueryBuilder()
       .relation(Vault, 'category')
       .of(vault)
@@ -104,7 +111,7 @@ export class VaultService {
 
   async remove(userId: string, id: string) {
     const vault = await this.findOneVault(userId, id, true);
-    return this.vaultService.remove(vault);
+    return this.vaultRepository.remove(vault);
   }
   async removeCategoryFromVault(
     userId: string,
@@ -121,7 +128,7 @@ export class VaultService {
       throw new NotFoundException('Vault or Category not found');
     }
 
-    const existingcategory = await this.vaultService
+    const existingcategory = await this.vaultRepository
       .createQueryBuilder()
       .relation(Vault, 'category')
       .of(vault)
@@ -132,7 +139,7 @@ export class VaultService {
     }
 
     // Remove category from the vault
-    await this.vaultService
+    await this.vaultRepository
       .createQueryBuilder()
       .relation(Vault, 'category')
       .of(vault)

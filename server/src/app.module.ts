@@ -14,6 +14,7 @@ import { QueueModule } from './queue/queue.module';
 import { AuthLogModule } from './auth_log/auth_log.module';
 import { CategoryModule } from './category/category.module';
 import { VaultModule } from './vault/vault.module';
+import { BackupModule } from './backup/backup.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { VaultModule } from './vault/vault.module';
     AuthLogModule,
     CategoryModule,
     VaultModule,
+    BackupModule,
   ],
   controllers: [AppController],
   providers: [

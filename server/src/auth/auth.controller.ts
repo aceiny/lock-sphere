@@ -55,7 +55,7 @@ export class AuthController {
     @Req() req: Request,
     @Body() createUserDto: CreateUserDto,
   ): Promise<ResponseInterface<null>> {
-    const user = await this.authService.signup(createUserDto);
+    const user = await this.authService.signup(req , createUserDto);
     await this.authService.signSession(req, user);
     return {
       message: 'Signup succesfully',
@@ -109,7 +109,7 @@ export class AuthController {
     @Body() verifyTfaDto: VerifyTfaDto,
     @Req() req: Request,
   ): Promise<ResponseInterface<null>> {
-    const user = await this.authService.verifyTfa(verifyTfaDto);
+    const user = await this.authService.verifyTfa(req, verifyTfaDto);
     await this.authService.signSession(req, user);
     return {
       message: 'TFA was succesfully verfied',

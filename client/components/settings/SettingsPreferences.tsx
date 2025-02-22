@@ -41,18 +41,6 @@ const SettingsPreferences = () => {
               onClick={() => setTheme(theme == "dark" ? "light" : "dark")}
             />
           </div>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <Eye className="w-4 h-4 text-primary" />
-                <Label>Auto-hide Passwords</Label>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Automatically mask passwords after viewing
-              </p>
-            </div>
-            <Switch />
-          </div>
         </CardContent>
       </Card>
     </motion.div>

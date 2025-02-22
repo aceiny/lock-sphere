@@ -78,7 +78,7 @@ export default function DashboardPage() {
             key={vault.id}
             website_name={vault.website_name}
             identifier={vault.identifier}
-            lastUpdated={vault.updatedAt}
+            createdAt={vault.createdAt}
             category={vault?.category?.name}
             encrypted_payload={vault.encrypted_payload}
             website_url={vault.website_url}

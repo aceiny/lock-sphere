@@ -4,6 +4,11 @@ import { Repository } from 'typeorm';
 import { AuthLog } from './entities/auth_log.entity';
 import { PaginatedResponse } from 'shared/interfaces/paginated.response.interface';
 import { CreateAuthLogInterface } from './type/create-auth-log.interface';
+import { Request } from 'express';
+import { AuthLogStatusEnum } from 'src/auth_log/type/auth-log.status.enum';
+import * as geoip from 'geoip-lite';
+import { AuthLogSourceEnum } from './type/auth-log.source.enum';
+import {UAParser} from 'ua-parser-js';
 
 @Injectable()
 export class AuthLogService {
@@ -30,12 +35,30 @@ export class AuthLogService {
       totalPages: Math.ceil(total / offset),
     };
   }
+  async findAllByUserId(userId: string): Promise<AuthLog[]> {
+    return this.authLogRepository.find({
+      where: { user: { id: userId } },
+      order: { loggedAt: 'DESC' },
+    });
+  }
   async createAuthLog(
+    req: Request,
     userId: string,
-    authLog: CreateAuthLogInterface,
+    source : AuthLogSourceEnum
   ): Promise<AuthLog> {
+    const location = geoip.lookup(req.ip);
+    console.log(location);
+    const agent_parser = new UAParser(req.headers['user-agent'] || 'Unknown',);
+    console.log(agent_parser);
+    const auth_log_data: CreateAuthLogInterface = {
+        ip_address: req.ip,
+        user_agent: `${agent_parser.getBrowser()} - ${agent_parser.getOS()}`,
+        status: AuthLogStatusEnum.SUCCESS,
+        location : location ? `${location.city}, ${location.country}` : 'Unknown',
+        source : source,
+    }
     const auth_log = this.authLogRepository.create({
-      ...authLog,
+      ...auth_log_data,
       user: { id: userId },
     });
     return this.authLogRepository.save(auth_log);
