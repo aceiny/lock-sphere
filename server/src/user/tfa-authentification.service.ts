@@ -11,11 +11,10 @@
     CHALLENGE_VERIFY_WINDOW,
     TFA_ENCRYPTION_KEY,
     TFA_ISSUER,
-    TFA_SECRET_TTL,
   } from 'shared/constants/tfa.constant';
   import { VerifyTfaDto } from './types/verify-tfa.dto';
   import { TfaState } from './types/tfa-state.enum';
-  import { randomBytes , createCipheriv, createDecipheriv } from 'crypto';
+  import { randomBytes , createCipheriv, createDecipheriv, randomInt } from 'crypto';
 import { SessionInterface } from 'shared/interfaces/session.interface';
   @Injectable()
   export class TfaAuthentificationService {
@@ -23,7 +22,6 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
     //switch to store secret in database
     private readonly TFA_ENCRYPTION_KEY = TFA_ENCRYPTION_KEY
     private readonly TFA_ISSUER = TFA_ISSUER;
-    private readonly TFA_SECRET_TTL = TFA_SECRET_TTL;
     private readonly CHALLENGE_CREATION_LIMIT = CHALLENGE_CREATION_LIMIT;
     private readonly CHALLENGE_CREATION_WINDOW = CHALLENGE_CREATION_WINDOW;
     private readonly CHALLENGE_VERIFY_LIMIT = CHALLENGE_VERIFY_LIMIT;
@@ -42,6 +40,9 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
 
     private getChallengeVerificationKey(challangeId: string): string {
       return `tfa:challenge:verification:${challangeId}`;
+    }
+    private getEmailOtpKey(challangeId : string){
+      return `tfa:challenge:email-otp:${challangeId}`
     }
     //enables and disables 2fa for the user
     async enableTfa(userId: string, token: string) {
@@ -74,7 +75,7 @@ import { SessionInterface } from 'shared/interfaces/session.interface';
       // change the user 2FA state to false
       await this.userService.changeTfaState(user , TfaState.DISABLED);
       // delete the 2FA secret and attempts key from redis if exists
-      await this.userService.changeTfaState(user , null)
+      await this.userService.changeUserTfaSecret(user , null)
       return true;
     }
     async initiateTfaEnabling(userId: string) {

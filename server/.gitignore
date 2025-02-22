@@ -1,8 +1,10 @@
 # compiled output
+
 /dist
 /node_modules
 /build
 specs.txt
+todo.txt
 # Logs
 logs
 *.log

@@ -6,13 +6,13 @@ import { Resend } from 'resend';
 @Injectable()
 export class MailService {
   private resend: Resend;
+  private readonly FROM_EMAIL = getEnvOrFatal<string>('EMAIL_FROM');
   constructor() {
     this.resend = new Resend(getEnvOrFatal('RESEND_API_KEY'));
   }
   async sendNewLoginMail(options: SendEmailOptions) {
-    console.log('Sending email');
     const data = {
-      from: getEnvOrFatal<string>('EMAIL_FROM'),
+      from: this.FROM_EMAIL,
       to: options.to,
       subject: options.subject,
       text: 'New login',

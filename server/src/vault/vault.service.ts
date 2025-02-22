@@ -23,7 +23,6 @@ export class VaultService {
       userId,
       createVaultDto.category_ids,
     );
-    console.log(categories);
     if (categories.length !== createVaultDto.category_ids.length) {
       throw new NotFoundException('One or more categories not found');
     }

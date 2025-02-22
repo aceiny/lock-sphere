@@ -55,7 +55,7 @@ const ENV_VAR_TYPES: Record<string, EnvVarConfig> = {
   // tfa configuration
   TFA_ISSUER: { type: 'string' },
   TFA_SECRET_TTL: { type: 'number' },
-
+  EMAIL_OTP_TTL: { type: 'number' },
   CHALLENGE_CREATION_LIMIT: { type: 'number' },
   CHALLENGE_CREATION_WINDOW: { type: 'number' },
   CHALLENGE_VERIFY_LIMIT: { type: 'number' },

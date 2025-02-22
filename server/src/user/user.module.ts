@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { SessionMiddleware } from 'common/middlewares/session.middleware';
 import { TfaAuthentificationService } from './tfa-authentification.service';
 import { RedisModule } from 'src/redis/redis.module';
+import { QueueModule } from 'src/queue/queue.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), RedisModule],

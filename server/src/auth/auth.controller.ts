@@ -118,9 +118,7 @@ export class AuthController {
     if(!user || !user.id) {
       throw new UnauthorizedException('Invalid session');
     }
-    console.log("check session")
     await this.authService.checkUserValid(user.id)
-    console.log('chedk user')
     return {
       message: 'Session is valid',
       status: HttpStatus.OK,

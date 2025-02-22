@@ -26,7 +26,6 @@ export class AuthService {
       email: string,
       password: string,
     ): Promise<SessionInterface> {
-      console.log(email, password);
       email = email.trim().toLowerCase();
       const user = await this.userService.findByEmailWithPassword(email);
       if (!user) {
@@ -124,7 +123,6 @@ export class AuthService {
   }
   async checkUserValid(userId : string){
     const user_obj = await this.userService.findOneById(userId)
-    console.log('user' , user_obj)
     return true
   }
   async passworMatch(password: string, hash: string): Promise<boolean> {

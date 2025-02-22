@@ -1,7 +1,6 @@
 import { getEnvOrFatal } from 'common/utils/env.util';
 
 export const TFA_ISSUER = getEnvOrFatal<string>('TFA_ISSUER');
-export const TFA_SECRET_TTL = getEnvOrFatal<number>('TFA_SECRET_TTL');
 export const TFA_ENCRYPTION_KEY = getEnvOrFatal<string>('TFA_ENCRYPTION_KEY')
 export const CHALLENGE_CREATION_LIMIT = getEnvOrFatal<number>(
   'CHALLENGE_CREATION_LIMIT',

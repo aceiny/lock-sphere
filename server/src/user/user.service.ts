@@ -107,7 +107,7 @@ export class UserService {
   update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
-  async changeUserTfaSecret(user : User , newSecret : string){
+  async changeUserTfaSecret(user : User , newSecret : string | null){
     user.tfa_secret = newSecret
     return this.userRepository.save(user)
   }
