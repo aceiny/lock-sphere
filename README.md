@@ -55,7 +55,11 @@ https://drawsql.app/teams/aceiny/diagrams/lock-sphere
 # API documentation is auto-generated using Swagger and can be accessed at:
 /docs
 ```
-
+## API Test 
+```bash
+# check a workin version of the api deployed and ready to be tested
+https://sphere.yxne.tech/docs
+```
 ## Getting Started
 
 ### Prerequisites
