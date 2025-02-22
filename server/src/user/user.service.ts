@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { TfaState } from './types/tfa-state.enum';
+import { CreateOrCheckMasterKeyDto } from './types/master-key.dto';
 
 @Injectable()
 export class UserService {
@@ -40,6 +41,13 @@ export class UserService {
     .createQueryBuilder('user')
     .where('user.id = :id' , {id})
     .addSelect('user.tfa_secret')
+    .getOne()
+  }
+  async findOneByIdWithMasterKey(id : string){
+    return this.userRepository
+    .createQueryBuilder('user')
+    .where('user.id = :id' , {id})
+    .addSelect('user.master_key')
     .getOne()
   }
   async findByEmailWithPassword(email: string): Promise<User | null> {
@@ -95,6 +103,22 @@ export class UserService {
       throw new UnauthorizedException('User not found');
     }
     return user;
+  }
+  async createOrCheckMasterKey(id : string , createOrCheckMasterKeyDto : CreateOrCheckMasterKeyDto) : Promise<{message : string}>{
+    const user = await this.findOneByIdWithMasterKey(id);
+    if(!user.master_key){
+      user.master_key = createOrCheckMasterKeyDto.master_key
+      await this.userRepository.save(user)
+      return {
+        message : 'Master key created',
+      }
+    }
+    if(user.master_key !== createOrCheckMasterKeyDto.master_key){
+      throw new UnauthorizedException('Master key not match')
+    }
+    return {
+      message : 'Master key match'
+    }
   }
   async updateAvatar(id : string , avatar : Express.Multer.File){
     if(!avatar){

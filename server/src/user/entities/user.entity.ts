@@ -29,6 +29,8 @@ export class User extends ChronoEntity {
   @Column({ type: 'varchar', length: 255, select: false , nullable : true })
   tfa_secret : string
   
+  @Column({ type: 'varchar', length: 255, select: false , nullable : true })
+  master_key : string
   @BeforeInsert()
   async hashPassword() {
     if(!this.password){

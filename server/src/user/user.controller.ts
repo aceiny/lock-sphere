@@ -22,6 +22,7 @@ import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { VerifyTfaSetupDto } from './types/verify-tfa.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterConfig } from 'config/multer-config';
+import { CreateOrCheckMasterKeyDto } from './types/master-key.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -89,7 +90,19 @@ export class UserController {
       status: HttpStatus.OK,
     };
   }
-
+  @ApiOperation({summary : 'update user avatar'})
+  @ApiCookieAuth('session-auth')
+  @Post('/master-key')
+  async createOrCheckMasterKey(
+    @GetUser() user: SessionInterface,
+    @Body() createOrCheckMasterKeyDto : CreateOrCheckMasterKeyDto
+  ) : Promise<ResponseInterface<undefined>>{
+    const {message} = await this.userService.createOrCheckMasterKey(user.id , createOrCheckMasterKeyDto);
+    return {
+      message,
+      status : HttpStatus.OK
+    }
+  }
   @ApiOperation({summary : 'update user avatar'})
   @ApiCookieAuth('session-auth')
   @Patch('/update-avatar')
