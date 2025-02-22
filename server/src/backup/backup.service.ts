@@ -13,7 +13,7 @@ export class BackupService {
     private readonly authLogService : AuthLogService
   ){}
   async getCopyOfBackup(userId : string){
-    const user = await this.userService.findOneByIdWithSecret(userId);
+    const user = await this.userService.findOneById(userId);
     const vaults = await this.vaultService.findAllByUserId(userId);
     const categories = await this.categoryService.findAllUserCategories(userId);
     const authLogs = await this.authLogService.findAllByUserId(userId);

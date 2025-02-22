@@ -31,7 +31,7 @@ export class User extends ChronoEntity {
   @Column({ type: 'enum', enum: TfaState, default: TfaState.DISABLED })
   tfa_state: TfaState;
 
-  @Column({ type: 'varchar', length: 255, select: false, nullable: true })
+  @Column({ type: 'varchar', length: 255, select: false, nullable: true  })
   tfa_secret: string;
 
   @Column({ type: 'varchar', length: 255, select: false, nullable: true })
