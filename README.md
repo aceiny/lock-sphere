@@ -252,7 +252,7 @@ client/
 
 ## Deployment
 
-1. Automated via GitHub Actions
+1. Automated via Coolify and github webhooks
 2. Docker containerization
 3. Deployment to personnel vps
 
@@ -262,4 +262,4 @@ MIT
 
 ## Contributors
 
-- Ahmed Yassine Zeraibi , yzeraibi2000@gmail.com
+- Ahmed Yassine Zeraibi (acein.dev@gmail.com)
