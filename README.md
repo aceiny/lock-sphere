@@ -95,23 +95,10 @@ $ npm run dev
 ### Environment Variables
 
 #### Server Environment Variables  
-```bash  
-$(cat server/.env.development)
+[📄 server/.env.development](server/.env.development)
 
-#### Client Environment Variables
-```bash  
-$(cat client/.env.development)
-
-
-### Running the app
-
-```bash
-# development
-$ nest start --watch || npm run dev
-
-# production mode
-$ npm run build 
-```
+#### Client Environment Variables  
+[📄 client/.env.development](client/.env.development)
 
 ## Project Structure
 
